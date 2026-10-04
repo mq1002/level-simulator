@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>等级模拟器 · Alpha 0.2.9</title>
+    <title>等级模拟器 · Alpha 0.3.0</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         body {
@@ -166,7 +166,7 @@
 <body>
     <div class="container">
         <h1>⚡ 等级模拟器</h1>
-        <div class="sub">Alpha 0.2.9 · 30级上限</div>
+        <div class="sub">Alpha 0.3.0 · 1.25次幂</div>
 
         <div class="level-box">
             <div class="level-number" id="levelDisplay">1</div>
@@ -386,7 +386,7 @@
             <button class="btn-tool" id="resetBtn">↻ 重置</button>
         </div>
 
-        <div class="footer-note">Alpha 0.2.9 · 30级上限 · 30级转生</div>
+        <div class="footer-note">Alpha 0.3.0 · 1.25次幂 · 30级上限</div>
     </div>
 
     <script>
@@ -414,15 +414,15 @@
                 { id: 19, name: '九千转', req: '转生9842次', type: 'rebirth', value: 9842 }
             ];
 
+            // ★ 修改：1.25次幂
             function getRequiredExp(level) {
                 const x = level + 1;
                 const expPart = 32 * Math.pow(2, 0.5 * x - 1);
-                const powerPart = 50 * Math.pow(Math.max(0, x - 2), 1.5);
+                const powerPart = 50 * Math.pow(Math.max(0, x - 2), 1.25);
                 if (x <= 3) return expPart;
                 return Math.min(expPart, powerPart);
             }
 
-            // ★ 等级上限
             function getLevelCap() {
                 return breakLimit === 1 ? Infinity : 30;
             }
@@ -1186,8 +1186,8 @@
             requestAnimationFrame(frameLoop);
             setInterval(saveGame, 5000);
 
-            console.log('✅ 等级模拟器 · Alpha 0.2.9');
-            console.log('📐 30级上限 · 30级转生 · 30级放大倍率');
+            console.log('✅ 等级模拟器 · Alpha 0.3.0');
+            console.log('📐 1.25次幂 · 30级上限 · 30级转生');
         })();
     </script>
 </body>

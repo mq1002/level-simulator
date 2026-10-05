@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>等级模拟器 · Alpha 5.7.1</title>
+    <title>等级模拟器 · Alpha 5.7.1 · 大数版</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         body {
@@ -131,7 +131,6 @@
         .import-actions button:hover { background: #3a4670; }
         .import-actions button.cancel { background: transparent; border: 1px solid #35405f; color: #6a7a9e; }
         .import-actions button.cancel:hover { background: #1f2740; color: #b0bedd; }
-
         .ach-section {
             margin-top: 14px; padding: 12px; background: #0f1422;
             border-radius: 20px; border: 1px solid #2a3455;
@@ -176,11 +175,13 @@
         }
         .oc-text { color: #ff88cc; font-size: 12px; font-weight: 600; }
     </style>
+    <!-- ★ 大数库：break_infinity.js -->
+    <script src="https://cdn.jsdelivr.net/npm/break_infinity.js@2.2.0/dist/break_infinity.min.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>⚡ 等级模拟器</h1>
-        <div class="sub">Alpha 5.7.1 · 渐进解锁</div>
+        <div class="sub">Alpha 5.7.1 · 渐进解锁 · 大数版</div>
 
         <div class="level-box">
             <div class="level-number" id="levelDisplay">1</div>
@@ -195,7 +196,6 @@
             <span id="expRequired">32.00</span>
         </div>
 
-        <!-- 超频状态条 -->
         <div id="overclockArea" style="display:none;">
             <div class="oc-bar-wrap">
                 <div class="oc-bar" id="ocBar"></div>
@@ -210,7 +210,6 @@
 
         <div id="offlineToast" style="display:none;" class="offline-toast"></div>
 
-        <!-- 基础强化（始终可见） -->
         <div class="upgrade-grid" id="cardBasicRow">
             <div class="upgrade-card">
                 <div class="label">⚡ 点击强化</div>
@@ -226,7 +225,6 @@
             </div>
         </div>
 
-        <!-- 随机涨落 -->
         <div class="upgrade-grid" id="cardRandomRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #4a6a9f;">
                 <div class="label">🎲 随机涨落</div>
@@ -242,7 +240,6 @@
             </div>
         </div>
 
-        <!-- 倍率 + 全自动 I -->
         <div class="upgrade-grid" id="cardMultiplierRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #ff9800;">
                 <div class="label">🌟 倍率增加</div>
@@ -258,7 +255,6 @@
             </div>
         </div>
 
-        <!-- 自动购买 -->
         <div class="upgrade-grid" id="cardAutoBuyRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #00bcd4;">
                 <div class="label">🤖 自动购买升级</div>
@@ -275,7 +271,6 @@
             </div>
         </div>
 
-        <!-- 全自动 II -->
         <div class="upgrade-grid" id="cardAutoIIRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #d4a017;">
                 <div class="label">🔁🔁 全自动 II</div>
@@ -291,7 +286,6 @@
             </div>
         </div>
 
-        <!-- 界限突破（解锁后才显示后续 >5 的升级） -->
         <div class="upgrade-grid" id="cardBreakLimitRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #8fbc8f;">
                 <div class="label">🌌 界限突破</div>
@@ -307,7 +301,6 @@
             </div>
         </div>
 
-        <!-- 免费的等级 -->
         <div class="upgrade-grid" id="cardFreeLevelRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #00bcd4;">
                 <div class="label">🎁 免费的等级</div>
@@ -323,7 +316,6 @@
             </div>
         </div>
 
-        <!-- 更多的等级 II + 自动的转化 -->
         <div class="upgrade-grid" id="cardAllLevelRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #9370db;">
                 <div class="label">📚📚 全部的等级</div>
@@ -339,7 +331,6 @@
             </div>
         </div>
 
-        <!-- 自动转生设置面板 -->
         <div class="upgrade-card" id="cardAutoModePanel" style="border-color: #ff9800; margin: 10px 0; display:none;">
             <div class="label">🌀 自动转生设置</div>
             <div style="display: flex; justify-content: center; gap: 6px; margin: 8px 0; flex-wrap: wrap;" id="autoModeRow">
@@ -372,36 +363,14 @@
         </div>
 
         <div class="info-grid">
-            <div class="info-item">
-                总经验
-                <strong id="totalExp">0</strong>
-            </div>
-            <div class="info-item">
-                点击次数
-                <strong id="clickCount">0</strong>
-            </div>
-            <div class="info-item">
-                每秒自动
-                <strong id="autoPerSec">0.00</strong>
-                <div class="small">次</div>
-            </div>
+            <div class="info-item">总经验<strong id="totalExp">0</strong></div>
+            <div class="info-item">点击次数<strong id="clickCount">0</strong></div>
+            <div class="info-item">每秒自动<strong id="autoPerSec">0.00</strong></div>
         </div>
         <div class="info-grid" style="margin-top:6px;">
-            <div class="info-item">
-                放大倍率
-                <strong id="multiplierDisplay">1.0</strong>
-                <div class="small">×</div>
-            </div>
-            <div class="info-item">
-                转生点
-                <strong id="rebirthPointsDisplay">0</strong>
-                <div class="small">点</div>
-            </div>
-            <div class="info-item">
-                经验倍率
-                <strong id="expMultiplierDisplay">1.0</strong>
-                <div class="small">×</div>
-            </div>
+            <div class="info-item">放大倍率<strong id="multiplierDisplay">1.0</strong></div>
+            <div class="info-item">转生点<strong id="rebirthPointsDisplay">0</strong></div>
+            <div class="info-item">经验倍率<strong id="expMultiplierDisplay">1.0</strong></div>
         </div>
 
         <div class="import-area" id="importArea">
@@ -423,11 +392,26 @@
             <button class="btn-tool" id="resetBtn">↻ 重置</button>
         </div>
 
-        <div class="footer-note">Alpha 5.7.1 · 渐进解锁 · 12分钟冷却 / 45秒×3</div>
+        <div class="footer-note">Alpha 5.7.1 · 大数版 · 12分钟冷却 / 45秒×3</div>
     </div>
 
     <script>
         (function() {
+            const D = (x) => new Decimal(x);
+            const D0 = () => new Decimal(0);
+            const D1 = () => new Decimal(1);
+
+            function formatDecimal(d) {
+                if (!(d instanceof Decimal)) d = new Decimal(d);
+                if (d.lt(1e6)) return d.toNumber().toFixed(2);
+                return d.toExponential(2).replace('e+', 'e');
+            }
+            function formatInt(d) {
+                if (!(d instanceof Decimal)) d = new Decimal(d);
+                if (d.lt(1e6)) return Math.floor(d.toNumber()).toString();
+                return d.toExponential(2).replace('e+', 'e');
+            }
+
             const ACHIEVEMENTS = [
                 { id: 0, name: '初来乍到', req: '达到3级', type: 'level', value: 3 },
                 { id: 1, name: '有点感觉了', req: '达到6级', type: 'level', value: 6 },
@@ -451,50 +435,48 @@
                 { id: 19, name: '九千转', req: '转生9842次', type: 'rebirth', value: 9842 }
             ];
 
-            function getRequiredExp(level) {
-                const x = level + 1;
-                const expPart = 32 * Math.pow(2, 0.5 * x - 1);
-                const powerPart = 50 * Math.pow(Math.max(0, x - 2), 1.25);
-                if (x <= 3) return expPart;
-                return Math.min(expPart, powerPart);
+            function getRequiredExp(levelD) {
+                const x = levelD.add(1);
+                const expPart = D(32).mul(D(2).pow(x.mul(0.5).sub(1)));
+                const powerPart = D(50).mul(Decimal.max(0, x.sub(2)).pow(1.25));
+                if (x.lte(3)) return expPart;
+                return Decimal.min(expPart, powerPart);
             }
-
             function getLevelCap() {
-                return breakLimit === 1 ? Infinity : 30;
+                return breakLimit === 1 ? D('1e15') : D(30);
             }
 
-            let level = 1;
-            let exp = 0;
-            let totalExp = 0;
-            let clicks = 0;
-            let manualCount = 0;
-            let autoCount = 0;
-
-            let rebirthCount = 0;
-            let rebirthPoints = 0;
+            let level = D(1);
+            let exp = D0();
+            let totalExp = D0();
+            let clicks = D0();
+            let manualCount = D0();
+            let autoCount = D0();
+            let rebirthCount = D0();
+            let rebirthPoints = D0();
 
             let rebirthAuto = 0;
             let rebirthAutoII = 0;
             let rebirthAutoIII = 0;
             let rebirthRandom = 0;
-            let rebirthCap = 0;
             let rebirthAutoBuy = 0;
             let autoRebirthUnlocked = 0;
             let autoRebirthEnabled = false;
             let breakLimit = 0;
             let freeLevel = 0;
-
             let moreLevel = 0;
             let allLevel = 0;
             let autoModeUnlocked = 0;
+            let multiplierUnlocked = 0;
+
+            let rebirthCap = D0();
+            let multiplierCount = D0();
+
             let autoMode = 'level';
             let autoGoal = 30;
             let autoTimeStart = Date.now();
-            let autoAmpStart = 0;
-            let autoPPStart = 0;
-
-            let multiplierUnlocked = 0;
-            let multiplierCount = 0;
+            let autoAmpStart = D0();
+            let autoPPStart = D0();
 
             let overclockUnlocked = 0;
             let overclockState = 'cooling';
@@ -508,7 +490,6 @@
             let lastAutoTick = Date.now();
             const TICK_INTERVAL = 50;
 
-            // ---------- DOM 引用（省略重复声明的部分，保持原样） ----------
             const $ = id => document.getElementById(id);
             const levelDisplay = $('levelDisplay');
             const levelLabel = $('levelLabel');
@@ -581,124 +562,98 @@
             const overclockBtn = $('overclockBtn');
             const overclockStatus = $('overclockStatus');
 
-            // ---------- 渐进解锁：控制卡片显隐 ----------
             function updateVisibility() {
                 const show = (id, cond) => {
                     const el = $(id);
                     if (el) el.style.display = cond ? '' : 'none';
                 };
-
-                // 随机涨落行：买了随机涨落前，整行只显示“随机涨落”卡（上限提高卡隐藏）
-                // 规则：没有购买随机涨落时，看不到上限提高
-                show('cardRandomRow', rebirthRandom === 1 || rebirthPoints >= 1 || rebirthCount >= 1);
-
-                // 上限提高卡：随机涨落未解锁时隐藏
-                show('rebirthCapBtn', true); // 按钮显隐由 disabled 控制，这里保持
+                show('cardRandomRow', rebirthRandom === 1 || rebirthPoints.gte(1) || rebirthCount.gte(1));
                 const capCard = rebirthCapBtn.closest('.upgrade-card');
                 if (capCard) capCard.style.display = (rebirthRandom === 1) ? '' : 'none';
-
-                // 倍率行：购买随机涨落后可见（含倍率增加 + 全自动 I）
                 show('cardMultiplierRow', rebirthRandom === 1);
-
-                // 自动购买行：购买随机涨落后可见（含自动购买 + 自动转生）
                 show('cardAutoBuyRow', rebirthRandom === 1);
-
-                // 自动转生卡：购买自动购买后才可见
                 show('cardAutoRebirth', rebirthAutoBuy === 1);
-
-                // 全自动 II 行：购买全自动 I 后才可见
                 show('cardAutoIIRow', rebirthAuto === 1);
-
-                // 全自动 III 卡：购买全自动 II 后才可见
                 show('cardAutoIIIPlaceholder', rebirthAutoII === 1);
-
-                // 界限突破行：购买随机涨落后可见；界限突破购买后，显示后续 >5 的升级（经验超频）
                 show('cardBreakLimitRow', rebirthRandom === 1);
-                // 经验超频卡：购买界限突破后才可见
                 show('cardOverclock', breakLimit === 1);
-
-                // 免费的等级行：购买界限突破后才可见（价格 >5 的后续）
                 show('cardFreeLevelRow', breakLimit === 1);
-
-                // 更多的等级卡：购买免费的等级后才可见
                 show('cardMoreLevel', freeLevel === 1);
-
-                // 全部的等级行：购买更多的等级后才可见
                 show('cardAllLevelRow', moreLevel === 1);
-
-                // 自动转生设置面板：解锁自动的转化后才可见
                 show('cardAutoModePanel', autoModeUnlocked === 1);
             }
 
-            // 其余逻辑保持 Alpha 5.7.0 原样
-            function getManualReq() { return 2 + manualCount * 2; }
+            function getManualReq() { return D(2).add(manualCount.mul(2)); }
             function getAutoReq() {
-                if (autoCount === 0) return 3;
-                if (autoCount === 1) return 5;
-                return autoCount * 5;
+                if (autoCount.eq(0)) return D(3);
+                if (autoCount.eq(1)) return D(5);
+                return autoCount.mul(5);
             }
-            function getMultiplier() { return 1 + rebirthCount; }
+            function getMultiplier() { return D(1).add(rebirthCount); }
             function getAutoMultiplier() {
-                let m = 1;
-                if (rebirthAuto === 1) m *= 2;
-                if (rebirthAutoII === 1) m *= 3;
-                if (rebirthAutoIII === 1) m *= 4;
+                let m = D1();
+                if (rebirthAuto === 1) m = m.mul(2);
+                if (rebirthAutoII === 1) m = m.mul(3);
+                if (rebirthAutoIII === 1) m = m.mul(4);
                 return m;
             }
             function getExpMultiplier() {
-                if (multiplierUnlocked === 0) return 1;
-                return 1 + multiplierCount;
+                if (multiplierUnlocked === 0) return D1();
+                return D(1).add(multiplierCount);
             }
             function getOverclockMultiplier() {
-                if (overclockUnlocked === 1 && overclockState === 'active') return 3;
-                return 1;
+                if (overclockUnlocked === 1 && overclockState === 'active') return D(3);
+                return D1();
             }
             function getAutoPower() {
-                return autoCount * getAutoMultiplier() * getExpMultiplier() * getOverclockMultiplier();
+                return autoCount.mul(getAutoMultiplier()).mul(getExpMultiplier()).mul(getOverclockMultiplier());
             }
             function getClickPower() {
-                const base = 1 + manualCount;
+                const base = D(1).add(manualCount);
                 const multiplier = getMultiplier();
                 const expMult = getExpMultiplier();
                 const ocMult = getOverclockMultiplier();
-                let extra = 0;
+                let extra = D0();
                 if (rebirthRandom === 1) {
-                    extra = Math.floor(Math.random() * (rebirthCap + 1));
+                    const r = Math.random();
+                    extra = rebirthCap.mul(r).floor();
                 }
-                return multiplier * (base + extra) * expMult * ocMult;
+                return multiplier.mul(base.add(extra)).mul(expMult).mul(ocMult);
             }
             function getClickRange() {
-                const base = 1 + manualCount;
+                const base = D(1).add(manualCount);
                 const multiplier = getMultiplier();
                 const expMult = getExpMultiplier();
                 const ocMult = getOverclockMultiplier();
                 if (rebirthRandom === 0) {
-                    return { min: multiplier * base * expMult * ocMult, max: multiplier * base * expMult * ocMult, isRandom: false };
+                    const v = multiplier.mul(base).mul(expMult).mul(ocMult);
+                    return { min: v, max: v, isRandom: false };
                 }
                 return {
-                    min: multiplier * (base + 0) * expMult * ocMult,
-                    max: multiplier * (base + rebirthCap) * expMult * ocMult,
+                    min: multiplier.mul(base).mul(expMult).mul(ocMult),
+                    max: multiplier.mul(base.add(rebirthCap)).mul(expMult).mul(ocMult),
                     isRandom: true
                 };
             }
-            function getCapReq() { return 6 + rebirthCap * 3; }
-            function getMultiplierReq() { return 15 + multiplierCount * 15; }
+            function getCapReq() { return D(6).add(rebirthCap.mul(3)); }
+            function getMultiplierReq() { return D(15).add(multiplierCount.mul(15)); }
 
             function getRebirthPointThreshold() {
-                if (rebirthCount < 20) return 30;
-                if (breakLimit === 0) return 999999;
-                if (rebirthPoints <= 20) return 30;
-                return Math.floor(30 * (1 + Math.log10(rebirthPoints - 20)));
+                if (rebirthCount.lt(20)) return D(30);
+                if (breakLimit === 0) return D('1e15');
+                if (rebirthPoints.lte(20)) return D(30);
+                const v = 30 * (1 + Math.log10(rebirthPoints.toNumber() - 20));
+                return D(Math.floor(v));
             }
             function getRebirthMultiplierGain() {
-                if (level < 30) return 0;
-                return Math.pow(level - 29, 2);
+                if (level.lt(30)) return D0();
+                return level.sub(29).pow(2);
             }
             function getStartLevel() {
-                if (allLevel === 1) return 45;
-                if (moreLevel === 1) return 30;
-                if (freeLevel === 1) return 15;
-                return 1;
+                if (allLevel === 1) return D(45);
+                if (moreLevel === 1) return D(30);
+                if (freeLevel === 1) return D(15);
+                return D(1);
             }
             function getOfflineEfficiency(offlineHours) {
                 if (offlineHours <= 0) return 1;
@@ -709,21 +664,21 @@
             function calculateOfflineEarnings(seconds) {
                 const maxSeconds = 48 * 3600;
                 const cappedSeconds = Math.min(seconds, maxSeconds);
-                if (cappedSeconds <= 0) return { totalExp: 0, hours: 0, efficiency: 1 };
+                if (cappedSeconds <= 0) return { totalExp: D0(), hours: 0, efficiency: 1 };
                 const hours = cappedSeconds / 3600;
                 const basePerSecond = getAutoPower();
-                if (basePerSecond === 0) return { totalExp: 0, hours: hours, efficiency: 1 };
-                let totalGain = 0;
+                if (basePerSecond.eq(0)) return { totalExp: D0(), hours: hours, efficiency: 1 };
+                let totalGain = D0();
                 let remainingSeconds = cappedSeconds;
                 let hourIndex = 0;
                 while (remainingSeconds > 0) {
                     const hourSeconds = Math.min(remainingSeconds, 3600);
                     const eff = getOfflineEfficiency(hourIndex + 0.5);
-                    totalGain += basePerSecond * hourSeconds * eff;
+                    totalGain = totalGain.add(basePerSecond.mul(hourSeconds).mul(eff));
                     remainingSeconds -= hourSeconds;
                     hourIndex++;
                 }
-                const avgEff = totalGain / (basePerSecond * cappedSeconds);
+                const avgEff = totalGain.div(basePerSecond.mul(cappedSeconds)).toNumber();
                 return { totalExp: totalGain, hours: hours, efficiency: avgEff };
             }
 
@@ -732,8 +687,8 @@
                 for (const ach of ACHIEVEMENTS) {
                     if (achievements[ach.id]) continue;
                     let unlocked = false;
-                    if (ach.type === 'level' && level >= ach.value) unlocked = true;
-                    if (ach.type === 'rebirth' && rebirthCount >= ach.value) unlocked = true;
+                    if (ach.type === 'level' && level.gte(ach.value)) unlocked = true;
+                    if (ach.type === 'rebirth' && rebirthCount.gte(ach.value)) unlocked = true;
                     if (unlocked) {
                         achievements[ach.id] = true;
                         changed = true;
@@ -779,76 +734,80 @@
             }
 
             function render() {
-                // ★ 每次渲染前先更新显隐
                 updateVisibility();
 
                 const required = getRequiredExp(level);
                 const cap = getLevelCap();
-                const isCapped = (level >= cap);
-                const percent = isCapped ? 100 : Math.min(100, (exp / required) * 100);
+                const isCapped = level.gte(cap);
+                let percent = 0;
+                if (!isCapped && required.gt(0)) {
+                    percent = Math.min(100, exp.div(required).mul(100).toNumber());
+                } else if (isCapped) {
+                    percent = 100;
+                }
                 const power = getClickPower();
                 const autoPower = getAutoPower();
                 const multiplier = getMultiplier();
                 const expMult = getExpMultiplier();
                 const range = getClickRange();
 
-                levelDisplay.textContent = level;
-                levelLabel.textContent = isCapped ? `当前等级 (上限${cap === Infinity ? '∞' : cap})` : '当前等级';
+                levelDisplay.textContent = formatInt(level);
+                levelLabel.textContent = isCapped ? `当前等级 (上限${breakLimit === 1 ? '∞' : 30})` : '当前等级';
                 expBar.style.width = percent + '%';
-                expCurrent.textContent = isCapped ? 'MAX' : exp.toFixed(2);
-                expRequired.textContent = isCapped ? 'MAX' : required.toFixed(2);
-                totalExpDisplay.textContent = Math.floor(totalExp);
-                clickCountDisplay.textContent = clicks;
-                clickPower.textContent = power.toFixed(2);
-                autoPerSec.textContent = autoPower.toFixed(2);
+                expCurrent.textContent = isCapped ? 'MAX' : formatDecimal(exp);
+                expRequired.textContent = isCapped ? 'MAX' : formatDecimal(required);
+                totalExpDisplay.textContent = formatInt(totalExp);
+                clickCountDisplay.textContent = formatInt(clicks);
+                clickPower.textContent = formatDecimal(power);
+                autoPerSec.textContent = formatDecimal(autoPower);
 
                 if (range.isRandom) {
-                    clickRangeInfo.textContent = `🎲 ${range.min.toFixed(2)} ~ ${range.max.toFixed(2)}`;
+                    clickRangeInfo.textContent = `🎲 ${formatDecimal(range.min)} ~ ${formatDecimal(range.max)}`;
                 } else {
-                    clickRangeInfo.textContent = `固定 ${range.min.toFixed(2)}`;
+                    clickRangeInfo.textContent = `固定 ${formatDecimal(range.min)}`;
                 }
 
                 const mReq = getManualReq();
-                manualLevel.textContent = manualCount;
-                manualReq.textContent = mReq;
-                manualBtn.disabled = (level < mReq);
-                manualBtn.textContent = (level >= mReq) ? '强化' : '🔒';
+                manualLevel.textContent = formatInt(manualCount);
+                manualReq.textContent = formatInt(mReq);
+                manualBtn.disabled = level.lt(mReq);
+                manualBtn.textContent = level.gte(mReq) ? '强化' : '🔒';
 
                 const aReq = getAutoReq();
-                autoLevel.textContent = autoCount;
-                autoReq.textContent = aReq;
-                autoBtn.disabled = (level < aReq);
-                autoBtn.textContent = (level >= aReq) ? '强化' : '🔒';
+                autoLevel.textContent = formatInt(autoCount);
+                autoReq.textContent = formatInt(aReq);
+                autoBtn.disabled = level.lt(aReq);
+                autoBtn.textContent = level.gte(aReq) ? '强化' : '🔒';
 
-                multiplierLevel.textContent = expMult.toFixed(1);
+                multiplierLevel.textContent = formatDecimal(expMult);
                 const multReq = getMultiplierReq();
-                multiplierReq.textContent = multReq;
+                multiplierReq.textContent = formatInt(multReq);
                 if (multiplierUnlocked === 0) {
-                    multiplierBtn.disabled = (rebirthPoints < 5);
-                    multiplierBtn.textContent = (rebirthPoints < 5) ? '🔒 转生点不足' : '解锁 (5点)';
+                    multiplierBtn.disabled = rebirthPoints.lt(5);
+                    multiplierBtn.textContent = rebirthPoints.lt(5) ? '🔒 转生点不足' : '解锁 (5点)';
                 } else {
-                    multiplierBtn.disabled = (level < multReq);
-                    multiplierBtn.textContent = (level >= multReq) ? '购买' : '🔒 等级不足';
+                    multiplierBtn.disabled = level.lt(multReq);
+                    multiplierBtn.textContent = level.gte(multReq) ? '购买' : '🔒 等级不足';
                 }
 
                 overclockLevel.textContent = overclockUnlocked;
-                const canBuyOverclock = (rebirthPoints >= 50 && overclockUnlocked === 0);
+                const canBuyOverclock = rebirthPoints.gte(50) && overclockUnlocked === 0;
                 overclockBtn.disabled = !canBuyOverclock;
-                overclockBtn.textContent = (overclockUnlocked === 1) ? '✅ 已购买' : (rebirthPoints < 50 ? '🔒 转生点不足' : '购买 (50点)');
+                overclockBtn.textContent = overclockUnlocked === 1 ? '✅ 已购买' : (rebirthPoints.lt(50) ? '🔒 转生点不足' : '购买 (50点)');
 
                 if (overclockUnlocked === 1) {
                     overclockArea.style.display = 'block';
                     if (overclockState === 'active') {
                         const remain = OC_ACTIVE - overclockTime;
-                        const percent = (overclockTime / OC_ACTIVE) * 100;
-                        ocBar.style.width = percent + '%';
+                        const p = (overclockTime / OC_ACTIVE) * 100;
+                        ocBar.style.width = p + '%';
                         ocBar.style.background = 'linear-gradient(90deg, #ff44aa, #ff88cc)';
                         ocText.textContent = `⚡ 超频中！剩余 ${remain.toFixed(1)}s（×3经验）`;
                         overclockStatus.textContent = `⚡ 超频: 激活中`;
                     } else {
                         const remain = OC_COOL - overclockTime;
-                        const percent = (overclockTime / OC_COOL) * 100;
-                        ocBar.style.width = percent + '%';
+                        const p = (overclockTime / OC_COOL) * 100;
+                        ocBar.style.width = p + '%';
                         ocBar.style.background = 'linear-gradient(90deg, #4a6a9f, #8db4ff)';
                         ocText.textContent = `冷却中... 剩余 ${remain.toFixed(0)}s`;
                         overclockStatus.textContent = `⚡ 超频: 冷却中`;
@@ -859,64 +818,64 @@
                 }
 
                 rebirthAutoLevel.textContent = rebirthAuto;
-                rebirthAutoBtn.disabled = (rebirthPoints < 1 || rebirthAuto === 1);
-                rebirthAutoBtn.textContent = (rebirthAuto === 1) ? '✅ 已购买' : '购买';
+                rebirthAutoBtn.disabled = rebirthPoints.lt(1) || rebirthAuto === 1;
+                rebirthAutoBtn.textContent = rebirthAuto === 1 ? '✅ 已购买' : '购买';
 
                 rebirthAutoIILevel.textContent = rebirthAutoII;
-                const canBuyAutoII = (rebirthAuto === 1 && rebirthPoints >= 4 && rebirthAutoII === 0);
+                const canBuyAutoII = rebirthAuto === 1 && rebirthPoints.gte(4) && rebirthAutoII === 0;
                 rebirthAutoIIBtn.disabled = !canBuyAutoII;
-                rebirthAutoIIBtn.textContent = (rebirthAutoII === 1) ? '✅ 已购买' :
-                    (rebirthAuto === 0 ? '🔒 需先买 I' : (rebirthPoints < 4 ? '🔒 转生点不足' : '购买'));
+                rebirthAutoIIBtn.textContent = rebirthAutoII === 1 ? '✅ 已购买' :
+                    (rebirthAuto === 0 ? '🔒 需先买 I' : (rebirthPoints.lt(4) ? '🔒 转生点不足' : '购买'));
 
                 rebirthAutoIIILevel.textContent = rebirthAutoIII;
-                const canBuyAutoIII = (rebirthAutoII === 1 && rebirthPoints >= 20 && rebirthAutoIII === 0);
+                const canBuyAutoIII = rebirthAutoII === 1 && rebirthPoints.gte(20) && rebirthAutoIII === 0;
                 rebirthAutoIIIBtn.disabled = !canBuyAutoIII;
-                rebirthAutoIIIBtn.textContent = (rebirthAutoIII === 1) ? '✅ 已购买' :
-                    (rebirthAutoII === 0 ? '🔒 需先买 II' : (rebirthPoints < 20 ? '🔒 转生点不足' : '购买'));
+                rebirthAutoIIIBtn.textContent = rebirthAutoIII === 1 ? '✅ 已购买' :
+                    (rebirthAutoII === 0 ? '🔒 需先买 II' : (rebirthPoints.lt(20) ? '🔒 转生点不足' : '购买'));
 
                 rebirthRandomLevel.textContent = rebirthRandom;
-                rebirthRandomBtn.disabled = (rebirthPoints < 1 || rebirthRandom === 1);
-                rebirthRandomBtn.textContent = (rebirthRandom === 1) ? '✅ 已解锁' : '解锁';
+                rebirthRandomBtn.disabled = rebirthPoints.lt(1) || rebirthRandom === 1;
+                rebirthRandomBtn.textContent = rebirthRandom === 1 ? '✅ 已解锁' : '解锁';
 
                 const capReq = getCapReq();
-                rebirthCapLevel.textContent = rebirthCap;
-                rebirthCapReq.textContent = capReq;
-                const capUnlockable = (rebirthRandom === 1 && level >= capReq);
+                rebirthCapLevel.textContent = formatInt(rebirthCap);
+                rebirthCapReq.textContent = formatInt(capReq);
+                const capUnlockable = rebirthRandom === 1 && level.gte(capReq);
                 rebirthCapBtn.disabled = !capUnlockable;
-                rebirthCapBtn.textContent = (rebirthRandom === 0) ? '🔒 需先解锁随机涨落' : (level >= capReq ? '购买' : '🔒 等级不足');
+                rebirthCapBtn.textContent = rebirthRandom === 0 ? '🔒 需先解锁随机涨落' : (level.gte(capReq) ? '购买' : '🔒 等级不足');
 
                 rebirthAutoBuyLevel.textContent = rebirthAutoBuy;
-                const canBuyAutoBuy = (rebirthPoints >= 2 && rebirthAutoBuy === 0 && rebirthRandom === 1);
+                const canBuyAutoBuy = rebirthPoints.gte(2) && rebirthAutoBuy === 0 && rebirthRandom === 1;
                 rebirthAutoBuyBtn.disabled = !canBuyAutoBuy;
-                rebirthAutoBuyBtn.textContent = (rebirthAutoBuy === 1) ? '✅ 已解锁' :
-                    (rebirthRandom === 0 ? '🔒 需先解锁随机涨落' : (rebirthPoints < 2 ? '🔒 转生点不足' : '解锁'));
+                rebirthAutoBuyBtn.textContent = rebirthAutoBuy === 1 ? '✅ 已解锁' :
+                    (rebirthRandom === 0 ? '🔒 需先解锁随机涨落' : (rebirthPoints.lt(2) ? '🔒 转生点不足' : '解锁'));
 
                 breakLimitLevel.textContent = breakLimit;
-                const canBreakLimit = (rebirthPoints >= 5 && breakLimit === 0);
+                const canBreakLimit = rebirthPoints.gte(5) && breakLimit === 0;
                 breakLimitBtn.disabled = !canBreakLimit;
-                breakLimitBtn.textContent = (breakLimit === 1) ? '✅ 已购买' : (rebirthPoints < 5 ? '🔒 转生点不足' : '购买 (5点)');
+                breakLimitBtn.textContent = breakLimit === 1 ? '✅ 已购买' : (rebirthPoints.lt(5) ? '🔒 转生点不足' : '购买 (5点)');
 
                 freeLevelValue.textContent = freeLevel;
-                const canBuyFreeLevel = (rebirthPoints >= 5 && freeLevel === 0);
+                const canBuyFreeLevel = rebirthPoints.gte(5) && freeLevel === 0;
                 freeLevelBtn.disabled = !canBuyFreeLevel;
-                freeLevelBtn.textContent = (freeLevel === 1) ? '✅ 已购买' : (rebirthPoints < 5 ? '🔒 转生点不足' : '购买 (5点)');
+                freeLevelBtn.textContent = freeLevel === 1 ? '✅ 已购买' : (rebirthPoints.lt(5) ? '🔒 转生点不足' : '购买 (5点)');
 
                 moreLevelLevel.textContent = moreLevel;
-                const canBuyMoreLevel = (rebirthPoints >= 15 && moreLevel === 0);
+                const canBuyMoreLevel = rebirthPoints.gte(15) && moreLevel === 0;
                 moreLevelBtn.disabled = !canBuyMoreLevel;
-                moreLevelBtn.textContent = (moreLevel === 1) ? '✅ 已购买' : (rebirthPoints < 15 ? '🔒 转生点不足' : '购买 (15点)');
+                moreLevelBtn.textContent = moreLevel === 1 ? '✅ 已购买' : (rebirthPoints.lt(15) ? '🔒 转生点不足' : '购买 (15点)');
 
                 allLevelLevel.textContent = allLevel;
-                const canBuyAllLevel = (rebirthPoints >= 45 && allLevel === 0 && moreLevel === 1);
+                const canBuyAllLevel = rebirthPoints.gte(45) && allLevel === 0 && moreLevel === 1;
                 allLevelBtn.disabled = !canBuyAllLevel;
-                allLevelBtn.textContent = (allLevel === 1) ? '✅ 已购买' :
-                    (moreLevel === 0 ? '🔒 需先买 I' : (rebirthPoints < 45 ? '🔒 转生点不足' : '购买 (45点)'));
+                allLevelBtn.textContent = allLevel === 1 ? '✅ 已购买' :
+                    (moreLevel === 0 ? '🔒 需先买 I' : (rebirthPoints.lt(45) ? '🔒 转生点不足' : '购买 (45点)'));
 
                 autoModeLevel.textContent = autoModeUnlocked;
-                const canUnlockAutoMode = (rebirthPoints >= 30 && autoModeUnlocked === 0 && autoRebirthUnlocked === 1);
+                const canUnlockAutoMode = rebirthPoints.gte(30) && autoModeUnlocked === 0 && autoRebirthUnlocked === 1;
                 autoModeBtn.disabled = !canUnlockAutoMode;
-                autoModeBtn.textContent = (autoModeUnlocked === 1) ? '✅ 已解锁' :
-                    (autoRebirthUnlocked === 0 ? '🔒 需先解锁自动转生' : (rebirthPoints < 30 ? '🔒 转生点不足' : '解锁 (30点)'));
+                autoModeBtn.textContent = autoModeUnlocked === 1 ? '✅ 已解锁' :
+                    (autoRebirthUnlocked === 0 ? '🔒 需先解锁自动转生' : (rebirthPoints.lt(30) ? '🔒 转生点不足' : '解锁 (30点)'));
 
                 document.querySelectorAll('#autoModeRow button').forEach(btn => {
                     const isActive = btn.dataset.mode === autoMode;
@@ -933,10 +892,10 @@
                 }
 
                 autoRebirthLevel.textContent = autoRebirthUnlocked;
-                const canUnlockAutoRebirth = (rebirthPoints >= 3 && autoRebirthUnlocked === 0 && rebirthAutoBuy === 1);
+                const canUnlockAutoRebirth = rebirthPoints.gte(3) && autoRebirthUnlocked === 0 && rebirthAutoBuy === 1;
                 autoRebirthBtn.disabled = !canUnlockAutoRebirth;
-                autoRebirthBtn.textContent = (autoRebirthUnlocked === 1) ? '✅ 已解锁' :
-                    (rebirthAutoBuy === 0 ? '🔒 需先解锁自动购买' : (rebirthPoints < 3 ? '🔒 转生点不足' : '解锁'));
+                autoRebirthBtn.textContent = autoRebirthUnlocked === 1 ? '✅ 已解锁' :
+                    (rebirthAutoBuy === 0 ? '🔒 需先解锁自动购买' : (rebirthPoints.lt(3) ? '🔒 转生点不足' : '解锁'));
 
                 if (autoRebirthUnlocked === 1) {
                     autoRebirthToggleBtn.style.display = 'block';
@@ -945,18 +904,18 @@
                     autoRebirthToggleBtn.style.display = 'none';
                 }
 
-                rebirthCountDisplay.textContent = rebirthCount;
-                rebirthPointsDisplay.textContent = rebirthPoints;
-                multiplierDisplay.textContent = multiplier.toFixed(1);
-                expMultiplierDisplay.textContent = expMult.toFixed(1);
+                rebirthCountDisplay.textContent = formatInt(rebirthCount);
+                rebirthPointsDisplay.textContent = formatInt(rebirthPoints);
+                multiplierDisplay.textContent = formatDecimal(multiplier);
+                expMultiplierDisplay.textContent = formatDecimal(expMult);
 
-                const canRebirth = (level >= 30);
+                const canRebirth = level.gte(30);
                 rebirthBtn.disabled = !canRebirth;
                 rebirthBtn.textContent = canRebirth ? '🌀 转生' : '🔒 30级';
                 rebirthBtn2.disabled = !canRebirth;
                 rebirthBtn2.textContent = canRebirth ? '🌀 转生' : '🔒 需要30级';
 
-                rebirthStatus.textContent = `🌀 ${rebirthCount}转`;
+                rebirthStatus.textContent = `🌀 ${formatInt(rebirthCount)}转`;
                 autoBuyStatus.textContent = rebirthAutoBuy === 1 ? '🤖 自动购买: 开' : '🤖 自动购买: 关';
                 autoRebirthStatus.textContent = autoRebirthEnabled ? '🌀 自动转生: 开' : '🌀 自动转生: 关';
 
@@ -973,26 +932,32 @@
                 checkAchievements();
             }
 
+            // ★ 改动一：guard 100000 → 1000
             function checkLevelUp() {
                 const cap = getLevelCap();
-                while (true) {
+                // guard = 1000：单次 tick 最多升 1000 级，剩下的留给下一 tick
+                let guard = 0;
+                while (guard < 1000) {
+                    guard++;
                     const required = getRequiredExp(level);
-                    if (exp >= required && level < cap) {
-                        exp -= required;
-                        level += 1;
+                    if (required.lte(0)) break;
+                    if (exp.gte(required) && level.lt(cap)) {
+                        exp = exp.sub(required);
+                        level = level.add(1);
                     } else {
-                        if (level >= cap) { exp = 0; }
+                        if (level.gte(cap)) exp = D0();
                         break;
                     }
                 }
             }
 
             function addExp(amount, isManual = true) {
+                if (!(amount instanceof Decimal)) amount = D(amount);
                 const cap = getLevelCap();
-                if (level >= cap) { if (isManual) clicks += 1; return; }
-                exp += amount;
-                totalExp += amount;
-                if (isManual) clicks += 1;
+                if (level.gte(cap)) { if (isManual) clicks = clicks.add(1); return; }
+                exp = exp.add(amount);
+                totalExp = totalExp.add(amount);
+                if (isManual) clicks = clicks.add(1);
                 checkLevelUp();
                 render();
             }
@@ -1004,54 +969,56 @@
                 setTimeout(() => { clickBtn.style.transform = ''; }, 80);
             }
 
+            // ★ 改动二：attempt < 20 → attempt < 100
             function autoBuyUpgrades() {
                 if (rebirthAutoBuy === 0) return;
                 let bought = false;
                 let attempt = 0;
-                while (attempt < 20) {
+                // 100：一次 tick 最多买 100 次
+                while (attempt < 100) {
                     attempt++;
-                    if (level >= getManualReq()) { manualCount += 1; bought = true; continue; }
-                    if (level >= getAutoReq()) { autoCount += 1; bought = true; continue; }
-                    if (rebirthRandom === 1 && level >= getCapReq()) { rebirthCap += 1; bought = true; continue; }
-                    if (multiplierUnlocked === 1 && level >= getMultiplierReq()) { multiplierCount += 1; bought = true; continue; }
+                    if (level.gte(getManualReq())) { manualCount = manualCount.add(1); bought = true; continue; }
+                    if (level.gte(getAutoReq())) { autoCount = autoCount.add(1); bought = true; continue; }
+                    if (rebirthRandom === 1 && level.gte(getCapReq())) { rebirthCap = rebirthCap.add(1); bought = true; continue; }
+                    if (multiplierUnlocked === 1 && level.gte(getMultiplierReq())) { multiplierCount = multiplierCount.add(1); bought = true; continue; }
                     break;
                 }
                 if (bought) { render(); saveGame(); }
             }
 
-            function buyManual() { if (level >= getManualReq()) { manualCount += 1; render(); } }
-            function buyAuto() { if (level >= getAutoReq()) { autoCount += 1; render(); } }
+            function buyManual() { if (level.gte(getManualReq())) { manualCount = manualCount.add(1); render(); } }
+            function buyAuto() { if (level.gte(getAutoReq())) { autoCount = autoCount.add(1); render(); } }
             function buyMultiplier() {
                 if (multiplierUnlocked === 0) {
-                    if (rebirthPoints >= 5) { rebirthPoints -= 5; multiplierUnlocked = 1; render(); }
+                    if (rebirthPoints.gte(5)) { rebirthPoints = rebirthPoints.sub(5); multiplierUnlocked = 1; render(); }
                 } else {
-                    if (level >= getMultiplierReq()) { multiplierCount += 1; render(); }
+                    if (level.gte(getMultiplierReq())) { multiplierCount = multiplierCount.add(1); render(); }
                 }
             }
             function buyOverclock() {
-                if (rebirthPoints >= 50 && overclockUnlocked === 0) {
-                    rebirthPoints -= 50;
+                if (rebirthPoints.gte(50) && overclockUnlocked === 0) {
+                    rebirthPoints = rebirthPoints.sub(50);
                     overclockUnlocked = 1;
                     overclockState = 'cooling';
                     overclockTime = 0;
                     render();
                 }
             }
-            function buyRebirthAuto() { if (rebirthPoints >= 1 && rebirthAuto === 0) { rebirthPoints -= 1; rebirthAuto = 1; render(); } }
-            function buyRebirthAutoII() { if (rebirthAuto === 1 && rebirthPoints >= 4 && rebirthAutoII === 0) { rebirthPoints -= 4; rebirthAutoII = 1; render(); } }
-            function buyRebirthAutoIII() { if (rebirthAutoII === 1 && rebirthPoints >= 20 && rebirthAutoIII === 0) { rebirthPoints -= 20; rebirthAutoIII = 1; render(); } }
-            function buyRebirthRandom() { if (rebirthPoints >= 1 && rebirthRandom === 0) { rebirthPoints -= 1; rebirthRandom = 1; render(); } }
-            function buyRebirthCap() { if (rebirthRandom === 1 && level >= getCapReq()) { rebirthCap += 1; render(); } }
-            function buyRebirthAutoBuy() { if (rebirthPoints >= 2 && rebirthAutoBuy === 0 && rebirthRandom === 1) { rebirthPoints -= 2; rebirthAutoBuy = 1; render(); } }
-            function buyBreakLimit() { if (rebirthPoints >= 5 && breakLimit === 0) { rebirthPoints -= 5; breakLimit = 1; render(); } }
-            function buyFreeLevel() { if (rebirthPoints >= 5 && freeLevel === 0) { rebirthPoints -= 5; freeLevel = 1; render(); } }
-            function buyMoreLevel() { if (rebirthPoints >= 15 && moreLevel === 0) { rebirthPoints -= 15; moreLevel = 1; render(); } }
-            function buyAllLevel() { if (rebirthPoints >= 45 && allLevel === 0 && moreLevel === 1) { rebirthPoints -= 45; allLevel = 1; render(); } }
-            function buyAutoMode() { if (rebirthPoints >= 30 && autoModeUnlocked === 0 && autoRebirthUnlocked === 1) { rebirthPoints -= 30; autoModeUnlocked = 1; render(); } }
+            function buyRebirthAuto() { if (rebirthPoints.gte(1) && rebirthAuto === 0) { rebirthPoints = rebirthPoints.sub(1); rebirthAuto = 1; render(); } }
+            function buyRebirthAutoII() { if (rebirthAuto === 1 && rebirthPoints.gte(4) && rebirthAutoII === 0) { rebirthPoints = rebirthPoints.sub(4); rebirthAutoII = 1; render(); } }
+            function buyRebirthAutoIII() { if (rebirthAutoII === 1 && rebirthPoints.gte(20) && rebirthAutoIII === 0) { rebirthPoints = rebirthPoints.sub(20); rebirthAutoIII = 1; render(); } }
+            function buyRebirthRandom() { if (rebirthPoints.gte(1) && rebirthRandom === 0) { rebirthPoints = rebirthPoints.sub(1); rebirthRandom = 1; render(); } }
+            function buyRebirthCap() { if (rebirthRandom === 1 && level.gte(getCapReq())) { rebirthCap = rebirthCap.add(1); render(); } }
+            function buyRebirthAutoBuy() { if (rebirthPoints.gte(2) && rebirthAutoBuy === 0 && rebirthRandom === 1) { rebirthPoints = rebirthPoints.sub(2); rebirthAutoBuy = 1; render(); } }
+            function buyBreakLimit() { if (rebirthPoints.gte(5) && breakLimit === 0) { rebirthPoints = rebirthPoints.sub(5); breakLimit = 1; render(); } }
+            function buyFreeLevel() { if (rebirthPoints.gte(5) && freeLevel === 0) { rebirthPoints = rebirthPoints.sub(5); freeLevel = 1; render(); } }
+            function buyMoreLevel() { if (rebirthPoints.gte(15) && moreLevel === 0) { rebirthPoints = rebirthPoints.sub(15); moreLevel = 1; render(); } }
+            function buyAllLevel() { if (rebirthPoints.gte(45) && allLevel === 0 && moreLevel === 1) { rebirthPoints = rebirthPoints.sub(45); allLevel = 1; render(); } }
+            function buyAutoMode() { if (rebirthPoints.gte(30) && autoModeUnlocked === 0 && autoRebirthUnlocked === 1) { rebirthPoints = rebirthPoints.sub(30); autoModeUnlocked = 1; render(); } }
 
             function unlockAutoRebirth() {
-                if (rebirthPoints >= 3 && autoRebirthUnlocked === 0 && rebirthAutoBuy === 1) {
-                    rebirthPoints -= 3; autoRebirthUnlocked = 1; autoRebirthEnabled = true; render();
+                if (rebirthPoints.gte(3) && autoRebirthUnlocked === 0 && rebirthAutoBuy === 1) {
+                    rebirthPoints = rebirthPoints.sub(3); autoRebirthUnlocked = 1; autoRebirthEnabled = true; render();
                 }
             }
             function toggleAutoRebirth() {
@@ -1059,49 +1026,49 @@
             }
 
             function performRebirth(silent = false) {
-                if (level < 30) return;
+                if (level.lt(30)) return;
                 if (!silent) {
                     const threshold = getRebirthPointThreshold();
                     const multiplierGain = getRebirthMultiplierGain();
-                    if (!confirm(`确定转生吗？\n当前等级: ${level}\n放大倍率增加: +${multiplierGain}\n转生点门槛: ${threshold}级\n当前转生点: ${rebirthPoints}\n\n转生升级将永久保留！`)) return;
+                    if (!confirm(`确定转生吗？\n当前等级: ${formatInt(level)}\n放大倍率增加: +${formatDecimal(multiplierGain)}\n转生点门槛: ${formatInt(threshold)}级\n当前转生点: ${formatInt(rebirthPoints)}\n\n转生升级将永久保留！`)) return;
                 }
                 const multiplierGain = getRebirthMultiplierGain();
-                rebirthCount += multiplierGain;
-                let pointsGained = 0;
+                rebirthCount = rebirthCount.add(multiplierGain);
+                let pointsGained = D0();
                 const threshold = getRebirthPointThreshold();
-                if (rebirthCount >= 20 && breakLimit === 0) {
-                    pointsGained = 0;
-                } else if (level >= threshold) {
-                    pointsGained = 1;
+                if (rebirthCount.gte(20) && breakLimit === 0) {
+                    pointsGained = D0();
+                } else if (level.gte(threshold)) {
+                    pointsGained = D1();
                 }
-                rebirthPoints += pointsGained;
+                rebirthPoints = rebirthPoints.add(pointsGained);
                 level = getStartLevel();
-                exp = 0;
-                totalExp = 0;
-                clicks = 0;
-                manualCount = 0;
-                autoCount = 0;
-                multiplierCount = 0;
-                rebirthCap = 0;
+                exp = D0();
+                totalExp = D0();
+                clicks = D0();
+                manualCount = D0();
+                autoCount = D0();
+                multiplierCount = D0();
+                rebirthCap = D0();
                 autoTimeStart = Date.now();
                 autoAmpStart = getMultiplier();
                 autoPPStart = rebirthPoints;
                 render();
                 saveGame();
                 if (!silent) {
-                    alert(`✅ 转生成功！\n放大倍率增加: +${multiplierGain}\n当前放大倍率: ${getMultiplier().toFixed(1)}x\n获得转生点: ${pointsGained}\n当前转生点: ${rebirthPoints}\n初始等级: ${level}级`);
+                    alert(`✅ 转生成功！\n放大倍率增加: +${formatDecimal(multiplierGain)}\n当前放大倍率: ${formatDecimal(getMultiplier())}x\n获得转生点: ${formatInt(pointsGained)}\n当前转生点: ${formatInt(rebirthPoints)}\n初始等级: ${formatInt(level)}级`);
                 }
             }
 
             function checkAutoRebirth() {
                 if (autoRebirthUnlocked !== 1 || !autoRebirthEnabled) return;
-                if (level < 30) return;
+                if (level.lt(30)) return;
                 let shouldRebirth = false;
                 switch (autoMode) {
-                    case 'level': if (level >= autoGoal) shouldRebirth = true; break;
+                    case 'level': if (level.gte(autoGoal)) shouldRebirth = true; break;
                     case 'time': if ((Date.now() - autoTimeStart) / 1000 >= autoGoal) shouldRebirth = true; break;
-                    case 'amp': if (getMultiplier() - autoAmpStart >= autoGoal) shouldRebirth = true; break;
-                    case 'pp': if (rebirthPoints - autoPPStart >= autoGoal) shouldRebirth = true; break;
+                    case 'amp': if (getMultiplier().sub(autoAmpStart).gte(autoGoal)) shouldRebirth = true; break;
+                    case 'pp': if (rebirthPoints.sub(autoPPStart).gte(autoGoal)) shouldRebirth = true; break;
                 }
                 if (autoModeUnlocked === 0 && autoMode !== 'level') shouldRebirth = false;
                 if (shouldRebirth) performRebirth(true);
@@ -1109,12 +1076,20 @@
 
             function getSaveData() {
                 return {
-                    level, exp, totalExp, clicks, manualCount, autoCount,
-                    rebirthCount, rebirthPoints,
+                    level: level.toString(),
+                    exp: exp.toString(),
+                    totalExp: totalExp.toString(),
+                    clicks: clicks.toString(),
+                    manualCount: manualCount.toString(),
+                    autoCount: autoCount.toString(),
+                    rebirthCount: rebirthCount.toString(),
+                    rebirthPoints: rebirthPoints.toString(),
+                    rebirthCap: rebirthCap.toString(),
+                    multiplierCount: multiplierCount.toString(),
                     rebirthAuto, rebirthAutoII, rebirthAutoIII,
-                    rebirthRandom, rebirthCap,
-                    rebirthAutoBuy, autoRebirthUnlocked, autoRebirthEnabled,
-                    multiplierUnlocked, multiplierCount, breakLimit, freeLevel,
+                    rebirthRandom, rebirthAutoBuy,
+                    autoRebirthUnlocked, autoRebirthEnabled,
+                    multiplierUnlocked, breakLimit, freeLevel,
                     moreLevel, allLevel, autoModeUnlocked, autoMode, autoGoal,
                     overclockUnlocked, overclockState, overclockTime,
                     achievements,
@@ -1123,24 +1098,24 @@
             }
 
             function loadSaveData(data) {
-                level = data.level || 1;
-                exp = data.exp || 0;
-                totalExp = data.totalExp || 0;
-                clicks = data.clicks || 0;
-                manualCount = data.manualCount || 0;
-                autoCount = data.autoCount || 0;
-                rebirthCount = data.rebirthCount || 0;
-                rebirthPoints = data.rebirthPoints || 0;
+                level = D(data.level || 1);
+                exp = D(data.exp || 0);
+                totalExp = D(data.totalExp || 0);
+                clicks = D(data.clicks || 0);
+                manualCount = D(data.manualCount || 0);
+                autoCount = D(data.autoCount || 0);
+                rebirthCount = D(data.rebirthCount || 0);
+                rebirthPoints = D(data.rebirthPoints || 0);
+                rebirthCap = D(data.rebirthCap || 0);
+                multiplierCount = D(data.multiplierCount || 0);
                 rebirthAuto = data.rebirthAuto || 0;
                 rebirthAutoII = data.rebirthAutoII || 0;
                 rebirthAutoIII = data.rebirthAutoIII || 0;
                 rebirthRandom = data.rebirthRandom || 0;
-                rebirthCap = data.rebirthCap || 0;
                 rebirthAutoBuy = data.rebirthAutoBuy || 0;
                 autoRebirthUnlocked = data.autoRebirthUnlocked || 0;
                 autoRebirthEnabled = data.autoRebirthEnabled || false;
                 multiplierUnlocked = data.multiplierUnlocked || 0;
-                multiplierCount = data.multiplierCount || 0;
                 breakLimit = data.breakLimit || 0;
                 freeLevel = data.freeLevel || 0;
                 moreLevel = data.moreLevel || 0;
@@ -1167,13 +1142,13 @@
 
             function saveGame() {
                 const data = getSaveData();
-                try { localStorage.setItem('expSimulatorSave', JSON.stringify(data)); } catch (e) {}
+                try { localStorage.setItem('expSimulatorSaveDecimal', JSON.stringify(data)); } catch (e) {}
                 lastSaveTime = Date.now();
             }
 
             function loadGame() {
                 try {
-                    const raw = localStorage.getItem('expSimulatorSave');
+                    const raw = localStorage.getItem('expSimulatorSaveDecimal');
                     if (!raw) return false;
                     const data = JSON.parse(raw);
                     loadSaveData(data);
@@ -1188,7 +1163,7 @@
                 importTextarea.value = base64;
                 importArea.classList.add('active');
                 importTextarea.select();
-                alert('📋 存档已生成，请复制文本框中的内容保存到Word！');
+                alert('📋 存档已生成，请复制文本框中的内容保存！');
             }
 
             function importFromText(base64) {
@@ -1207,13 +1182,14 @@
 
             function resetGame() {
                 if (confirm('确定重置所有进度吗？（转生数据也会丢失）')) {
-                    level = 1; exp = 0; totalExp = 0; clicks = 0;
-                    manualCount = 0; autoCount = 0;
-                    rebirthCount = 0; rebirthPoints = 0;
+                    level = D(1); exp = D0(); totalExp = D0(); clicks = D0();
+                    manualCount = D0(); autoCount = D0();
+                    rebirthCount = D0(); rebirthPoints = D0();
+                    rebirthCap = D0(); multiplierCount = D0();
                     rebirthAuto = 0; rebirthAutoII = 0; rebirthAutoIII = 0;
-                    rebirthRandom = 0; rebirthCap = 0;
-                    rebirthAutoBuy = 0; autoRebirthUnlocked = 0; autoRebirthEnabled = false;
-                    multiplierUnlocked = 0; multiplierCount = 0;
+                    rebirthRandom = 0; rebirthAutoBuy = 0;
+                    autoRebirthUnlocked = 0; autoRebirthEnabled = false;
+                    multiplierUnlocked = 0;
                     breakLimit = 0; freeLevel = 0;
                     moreLevel = 0; allLevel = 0; autoModeUnlocked = 0;
                     autoMode = 'level'; autoGoal = 30;
@@ -1310,10 +1286,10 @@
                     const ticks = Math.floor(elapsed / TICK_INTERVAL);
                     const autoPower = getAutoPower();
                     const cap = getLevelCap();
-                    if (autoPower > 0 && level < cap) {
-                        const gain = (autoPower / 20) * ticks;
-                        exp += gain;
-                        totalExp += gain;
+                    if (autoPower.gt(0) && level.lt(cap)) {
+                        const gain = autoPower.div(20).mul(ticks);
+                        exp = exp.add(gain);
+                        totalExp = totalExp.add(gain);
                         checkLevelUp();
                     }
                     lastAutoTick += ticks * TICK_INTERVAL;
@@ -1330,8 +1306,10 @@
             requestAnimationFrame(frameLoop);
             setInterval(saveGame, 5000);
 
-            console.log('✅ 等级模拟器 · Alpha 5.7.1');
+            console.log('✅ 等级模拟器 · Alpha 5.7.1 · 大数版');
             console.log('⚡ 渐进解锁：按依赖关系显示升级卡片');
+            console.log('📐 大数库：break_infinity.js');
+            console.log('🔧 guard=1000, autoBuy=100');
         })();
     </script>
 </body>

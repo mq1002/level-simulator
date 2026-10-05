@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>等级模拟器 · Alpha 0.3.0</title>
+    <title>等级模拟器 · Alpha 5.7.0</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         body {
@@ -101,6 +101,10 @@
             background: #1f1400; border: 1px solid #ff9800; border-radius: 20px;
             padding: 2px 12px; display: inline-block; font-size: 11px; color: #ffb74d;
         }
+        .overclock-badge {
+            background: #1f0a1a; border: 1px solid #ff44aa; border-radius: 20px;
+            padding: 2px 12px; display: inline-block; font-size: 11px; color: #ff88cc;
+        }
         .offline-toast {
             background: #1a2240; border: 1px solid #3a4a70; border-radius: 16px;
             padding: 12px 16px; margin: 10px 0 6px; color: #d4dff0; font-size: 13px;
@@ -161,12 +165,22 @@
             color: #6a7a9e; font-size: 11px; letter-spacing: 2px;
             margin: 8px 0 4px; padding-left: 4px;
         }
+        .oc-bar-wrap {
+            background: #0b0f1b; border-radius: 30px; height: 10px; margin: 6px 0;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7); overflow: hidden;
+        }
+        .oc-bar {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #ff44aa, #ff88cc);
+            border-radius: 30px; transition: width 0.1s linear;
+        }
+        .oc-text { color: #ff88cc; font-size: 12px; font-weight: 600; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>⚡ 等级模拟器</h1>
-        <div class="sub">Alpha 0.3.0 · 1.25次幂</div>
+        <div class="sub">Alpha 5.7.0 · 经验超频</div>
 
         <div class="level-box">
             <div class="level-number" id="levelDisplay">1</div>
@@ -179,6 +193,14 @@
         <div class="exp-text">
             <span id="expCurrent">0.00</span>
             <span id="expRequired">32.00</span>
+        </div>
+
+        <!-- 超频状态条 -->
+        <div id="overclockArea" style="display:none;">
+            <div class="oc-bar-wrap">
+                <div class="oc-bar" id="ocBar"></div>
+            </div>
+            <div class="oc-text" id="ocText">超频就绪</div>
         </div>
 
         <button class="btn-primary" id="clickBtn">
@@ -268,38 +290,44 @@
             </div>
         </div>
         <div class="upgrade-grid">
+            <div class="upgrade-card" style="border-color: #ff44aa;">
+                <div class="label">⚡ 经验超频</div>
+                <div class="value"><span id="overclockLevel">0</span></div>
+                <div class="req">价格: 50 转生点 · 12:00冷却 / 45秒×3</div>
+                <button class="btn-upgrade" id="overclockBtn" style="border-color:#ff44aa;">购买</button>
+            </div>
             <div class="upgrade-card" style="border-color: #8fbc8f;">
                 <div class="label">🌌 界限突破</div>
                 <div class="value"><span id="breakLimitLevel">0</span></div>
                 <div class="req">价格: 5 转生点 · 可超过30级</div>
                 <button class="btn-upgrade" id="breakLimitBtn" style="border-color:#8fbc8f;">购买</button>
             </div>
+        </div>
+        <div class="upgrade-grid">
             <div class="upgrade-card" style="border-color: #00bcd4;">
                 <div class="label">🎁 免费的等级</div>
                 <div class="value"><span id="freeLevelValue">0</span></div>
                 <div class="req">价格: 5 转生点 · 初始15级</div>
                 <button class="btn-upgrade" id="freeLevelBtn" style="border-color:#00bcd4;">购买</button>
             </div>
-        </div>
-        <div class="upgrade-grid">
             <div class="upgrade-card" style="border-color: #9370db;">
                 <div class="label">📚 更多的等级 I</div>
                 <div class="value"><span id="moreLevelLevel">0</span></div>
                 <div class="req">价格: 15 转生点 · 保留30级</div>
                 <button class="btn-upgrade" id="moreLevelBtn" style="border-color:#9370db;">购买</button>
             </div>
+        </div>
+        <div class="upgrade-grid">
             <div class="upgrade-card" style="border-color: #9370db;">
                 <div class="label">📚📚 全部的等级</div>
                 <div class="value"><span id="allLevelLevel">0</span></div>
                 <div class="req">价格: 45 转生点 · 保留45级</div>
                 <button class="btn-upgrade" id="allLevelBtn" style="border-color:#9370db;">购买</button>
             </div>
-        </div>
-        <div class="upgrade-grid">
-            <div class="upgrade-card" style="border-color: #ff9800; grid-column: span 2;">
+            <div class="upgrade-card" style="border-color: #ff9800;">
                 <div class="label">🌀 自动的转化</div>
                 <div class="value"><span id="autoModeLevel">0</span></div>
-                <div class="req">价格: 30 转生点 · 前置: 自动转生 · 解锁额外3种模式</div>
+                <div class="req">价格: 30 转生点 · 前置: 自动转生</div>
                 <button class="btn-upgrade" id="autoModeBtn" style="border-color:#ff9800;">解锁</button>
             </div>
         </div>
@@ -381,12 +409,13 @@
             <span class="rebirth-badge" id="rebirthStatus">🌀 0转</span>
             <span class="auto-buy-badge" id="autoBuyStatus">🤖 自动购买: 关</span>
             <span class="auto-rebirth-badge" id="autoRebirthStatus">🌀 自动转生: 关</span>
+            <span class="overclock-badge" id="overclockStatus">⚡ 超频: 未解锁</span>
             <button class="btn-tool primary" id="exportBtn">💾 导出</button>
             <button class="btn-tool primary" id="importBtn">📂 导入</button>
             <button class="btn-tool" id="resetBtn">↻ 重置</button>
         </div>
 
-        <div class="footer-note">Alpha 0.3.0 · 1.25次幂 · 30级上限</div>
+        <div class="footer-note">Alpha 5.7.0 · 经验超频 · 12分钟冷却 / 45秒×3</div>
     </div>
 
     <script>
@@ -414,7 +443,6 @@
                 { id: 19, name: '九千转', req: '转生9842次', type: 'rebirth', value: 9842 }
             ];
 
-            // ★ 修改：1.25次幂
             function getRequiredExp(level) {
                 const x = level + 1;
                 const expPart = 32 * Math.pow(2, 0.5 * x - 1);
@@ -459,6 +487,13 @@
 
             let multiplierUnlocked = 0;
             let multiplierCount = 0;
+
+            // 经验超频
+            let overclockUnlocked = 0;
+            let overclockState = 'cooling'; // 'cooling' 或 'active'
+            let overclockTime = 0;           // 当前状态已过时间（秒）
+            const OC_COOL = 720;             // 12分钟冷却
+            const OC_ACTIVE = 45;            // 45秒超频
 
             let achievements = new Array(ACHIEVEMENTS.length).fill(false);
 
@@ -531,6 +566,14 @@
             const importArea = document.getElementById('importArea');
             const importTextarea = document.getElementById('importTextarea');
 
+            // 超频 DOM
+            const overclockArea = document.getElementById('overclockArea');
+            const ocBar = document.getElementById('ocBar');
+            const ocText = document.getElementById('ocText');
+            const overclockLevel = document.getElementById('overclockLevel');
+            const overclockBtn = document.getElementById('overclockBtn');
+            const overclockStatus = document.getElementById('overclockStatus');
+
             function getManualReq() { return 2 + manualCount * 2; }
             function getAutoReq() {
                 if (autoCount === 0) return 3;
@@ -549,29 +592,36 @@
                 if (multiplierUnlocked === 0) return 1;
                 return 1 + multiplierCount;
             }
+            // 超频倍率
+            function getOverclockMultiplier() {
+                if (overclockUnlocked === 1 && overclockState === 'active') return 3;
+                return 1;
+            }
             function getAutoPower() {
-                return autoCount * getAutoMultiplier() * getExpMultiplier();
+                return autoCount * getAutoMultiplier() * getExpMultiplier() * getOverclockMultiplier();
             }
             function getClickPower() {
                 const base = 1 + manualCount;
                 const multiplier = getMultiplier();
                 const expMult = getExpMultiplier();
+                const ocMult = getOverclockMultiplier();
                 let extra = 0;
                 if (rebirthRandom === 1) {
                     extra = Math.floor(Math.random() * (rebirthCap + 1));
                 }
-                return multiplier * (base + extra) * expMult;
+                return multiplier * (base + extra) * expMult * ocMult;
             }
             function getClickRange() {
                 const base = 1 + manualCount;
                 const multiplier = getMultiplier();
                 const expMult = getExpMultiplier();
+                const ocMult = getOverclockMultiplier();
                 if (rebirthRandom === 0) {
-                    return { min: multiplier * base * expMult, max: multiplier * base * expMult, isRandom: false };
+                    return { min: multiplier * base * expMult * ocMult, max: multiplier * base * expMult * ocMult, isRandom: false };
                 }
                 return {
-                    min: multiplier * (base + 0) * expMult,
-                    max: multiplier * (base + rebirthCap) * expMult,
+                    min: multiplier * (base + 0) * expMult * ocMult,
+                    max: multiplier * (base + rebirthCap) * expMult * ocMult,
                     isRandom: true
                 };
             }
@@ -725,6 +775,35 @@
                 } else {
                     multiplierBtn.disabled = (level < multReq);
                     multiplierBtn.textContent = (level >= multReq) ? '购买' : '🔒 等级不足';
+                }
+
+                // 经验超频
+                overclockLevel.textContent = overclockUnlocked;
+                const canBuyOverclock = (rebirthPoints >= 50 && overclockUnlocked === 0);
+                overclockBtn.disabled = !canBuyOverclock;
+                overclockBtn.textContent = (overclockUnlocked === 1) ? '✅ 已购买' : (rebirthPoints < 50 ? '🔒 转生点不足' : '购买 (50点)');
+
+                // 超频状态条
+                if (overclockUnlocked === 1) {
+                    overclockArea.style.display = 'block';
+                    if (overclockState === 'active') {
+                        const remain = OC_ACTIVE - overclockTime;
+                        const percent = (overclockTime / OC_ACTIVE) * 100;
+                        ocBar.style.width = percent + '%';
+                        ocBar.style.background = 'linear-gradient(90deg, #ff44aa, #ff88cc)';
+                        ocText.textContent = `⚡ 超频中！剩余 ${remain.toFixed(1)}s（×3经验）`;
+                        overclockStatus.textContent = `⚡ 超频: 激活中`;
+                    } else {
+                        const remain = OC_COOL - overclockTime;
+                        const percent = (overclockTime / OC_COOL) * 100;
+                        ocBar.style.width = percent + '%';
+                        ocBar.style.background = 'linear-gradient(90deg, #4a6a9f, #8db4ff)';
+                        ocText.textContent = `冷却中... 剩余 ${remain.toFixed(0)}s`;
+                        overclockStatus.textContent = `⚡ 超频: 冷却中`;
+                    }
+                } else {
+                    overclockArea.style.display = 'none';
+                    overclockStatus.textContent = `⚡ 超频: 未解锁`;
                 }
 
                 rebirthAutoLevel.textContent = rebirthAuto;
@@ -902,6 +981,15 @@
                     if (level >= getMultiplierReq()) { multiplierCount += 1; render(); }
                 }
             }
+            function buyOverclock() {
+                if (rebirthPoints >= 50 && overclockUnlocked === 0) {
+                    rebirthPoints -= 50;
+                    overclockUnlocked = 1;
+                    overclockState = 'cooling';
+                    overclockTime = 0;
+                    render();
+                }
+            }
             function buyRebirthAuto() { if (rebirthPoints >= 1 && rebirthAuto === 0) { rebirthPoints -= 1; rebirthAuto = 1; render(); } }
             function buyRebirthAutoII() { if (rebirthAuto === 1 && rebirthPoints >= 4 && rebirthAutoII === 0) { rebirthPoints -= 4; rebirthAutoII = 1; render(); } }
             function buyRebirthAutoIII() { if (rebirthAutoII === 1 && rebirthPoints >= 20 && rebirthAutoIII === 0) { rebirthPoints -= 20; rebirthAutoIII = 1; render(); } }
@@ -949,8 +1037,9 @@
                 clicks = 0;
                 manualCount = 0;
                 autoCount = 0;
-                multiplierUnlocked = 0;
+
                 multiplierCount = 0;
+                rebirthCap = 0;
 
                 autoTimeStart = Date.now();
                 autoAmpStart = getMultiplier();
@@ -987,6 +1076,7 @@
                     rebirthAutoBuy, autoRebirthUnlocked, autoRebirthEnabled,
                     multiplierUnlocked, multiplierCount, breakLimit, freeLevel,
                     moreLevel, allLevel, autoModeUnlocked, autoMode, autoGoal,
+                    overclockUnlocked, overclockState, overclockTime,
                     achievements,
                     timestamp: Date.now()
                 };
@@ -1019,6 +1109,9 @@
                 autoMode = data.autoMode || 'level';
                 autoGoal = data.autoGoal || 30;
                 autoGoalInput.value = autoGoal;
+                overclockUnlocked = data.overclockUnlocked || 0;
+                overclockState = data.overclockState || 'cooling';
+                overclockTime = data.overclockTime || 0;
                 if (data.achievements && data.achievements.length === ACHIEVEMENTS.length) {
                     achievements = data.achievements;
                 } else {
@@ -1085,6 +1178,9 @@
                     moreLevel = 0; allLevel = 0; autoModeUnlocked = 0;
                     autoMode = 'level'; autoGoal = 30;
                     autoGoalInput.value = 30;
+                    overclockUnlocked = 0;
+                    overclockState = 'cooling';
+                    overclockTime = 0;
                     achievements = new Array(ACHIEVEMENTS.length).fill(false);
                     offlineToast.style.display = 'none';
                     render();
@@ -1097,6 +1193,7 @@
             manualBtn.addEventListener('click', buyManual);
             autoBtn.addEventListener('click', buyAuto);
             multiplierBtn.addEventListener('click', buyMultiplier);
+            overclockBtn.addEventListener('click', buyOverclock);
             rebirthAutoBtn.addEventListener('click', buyRebirthAuto);
             rebirthAutoIIBtn.addEventListener('click', buyRebirthAutoII);
             rebirthAutoIIIBtn.addEventListener('click', buyRebirthAutoIII);
@@ -1152,6 +1249,29 @@
 
             window.addEventListener('beforeunload', saveGame);
 
+            // ★ 超频计时（每秒）
+            let lastOcTick = Date.now();
+            function overclockTick() {
+                if (overclockUnlocked !== 1) return;
+                const now = Date.now();
+                const delta = (now - lastOcTick) / 1000;
+                lastOcTick = now;
+
+                overclockTime += delta;
+
+                if (overclockState === 'cooling') {
+                    if (overclockTime >= OC_COOL) {
+                        overclockTime = 0;
+                        overclockState = 'active';
+                    }
+                } else {
+                    if (overclockTime >= OC_ACTIVE) {
+                        overclockTime = 0;
+                        overclockState = 'cooling';
+                    }
+                }
+            }
+
             function frameLoop() {
                 const now = Date.now();
                 const elapsed = now - lastAutoTick;
@@ -1172,6 +1292,7 @@
 
                     autoBuyUpgrades();
                     checkAutoRebirth();
+                    overclockTick();
                     render();
                 }
 
@@ -1186,7 +1307,8 @@
             requestAnimationFrame(frameLoop);
             setInterval(saveGame, 5000);
 
-            console.log('✅ 等级模拟器 · Alpha 0.3.0');
+            console.log('✅ 等级模拟器 · Alpha 5.7.0');
+            console.log('⚡ 经验超频：12分钟冷却 / 45秒×3');
             console.log('📐 1.25次幂 · 30级上限 · 30级转生');
         })();
     </script>

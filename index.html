@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>等级模拟器 · Alpha 5.7.0</title>
+    <title>等级模拟器 · Alpha 5.7.1</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         body {
@@ -180,7 +180,7 @@
 <body>
     <div class="container">
         <h1>⚡ 等级模拟器</h1>
-        <div class="sub">Alpha 5.7.0 · 经验超频</div>
+        <div class="sub">Alpha 5.7.1 · 渐进解锁</div>
 
         <div class="level-box">
             <div class="level-number" id="levelDisplay">1</div>
@@ -210,7 +210,8 @@
 
         <div id="offlineToast" style="display:none;" class="offline-toast"></div>
 
-        <div class="upgrade-grid">
+        <!-- 基础强化（始终可见） -->
+        <div class="upgrade-grid" id="cardBasicRow">
             <div class="upgrade-card">
                 <div class="label">⚡ 点击强化</div>
                 <div class="value">+<span id="manualLevel">0</span></div>
@@ -224,49 +225,30 @@
                 <button class="btn-upgrade" id="autoBtn">强化</button>
             </div>
         </div>
-        <div class="upgrade-grid">
+
+        <!-- 随机涨落 -->
+        <div class="upgrade-grid" id="cardRandomRow" style="display:none;">
+            <div class="upgrade-card" style="border-color: #4a6a9f;">
+                <div class="label">🎲 随机涨落</div>
+                <div class="value"><span id="rebirthRandomLevel">0</span></div>
+                <div class="req">价格: 1 转生点</div>
+                <button class="btn-upgrade" id="rebirthRandomBtn" style="border-color:#4a6a9f;">解锁</button>
+            </div>
             <div class="upgrade-card" style="border-color: #8fbc8f;">
                 <div class="label">📈 上限提高</div>
                 <div class="value"><span id="rebirthCapLevel">0</span></div>
                 <div class="req">需求: <span id="rebirthCapReq" class="highlight">6</span> 级 · 需先解锁随机涨落</div>
                 <button class="btn-upgrade" id="rebirthCapBtn" style="border-color:#8fbc8f;">购买</button>
             </div>
-            <div class="upgrade-card" style="border-color: #00bcd4;">
-                <div class="label">🤖 自动购买升级</div>
-                <div class="value"><span id="rebirthAutoBuyLevel">0</span></div>
-                <div class="req">价格: 2 转生点 · 前置: 随机涨落</div>
-                <button class="btn-upgrade" id="rebirthAutoBuyBtn" style="border-color:#00bcd4;">解锁</button>
-            </div>
         </div>
-        <div class="upgrade-grid">
+
+        <!-- 倍率 + 全自动 I -->
+        <div class="upgrade-grid" id="cardMultiplierRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #ff9800;">
                 <div class="label">🌟 倍率增加</div>
                 <div class="value">×<span id="multiplierLevel">1</span></div>
                 <div class="req">价格: 5 转生点 · 需求: <span id="multiplierReq" class="highlight">15</span> 级</div>
                 <button class="btn-upgrade" id="multiplierBtn" style="border-color:#ff9800;">购买</button>
-            </div>
-            <div class="upgrade-card" style="border-color: #cd5c5c;">
-                <div class="label">🌀 转生</div>
-                <div class="value"><span id="rebirthCountDisplay">0</span> 转</div>
-                <div class="req">需求: 30 级</div>
-                <button class="btn-tool rebirth" id="rebirthBtn" style="width:100%;margin-top:6px;padding:8px 0;">🔁 转生</button>
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="rebirth-section">
-            <button class="btn-rebirth" id="rebirthBtn2">🌀 转生</button>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="upgrade-grid">
-            <div class="upgrade-card" style="border-color: #4a6a9f;">
-                <div class="label">🎲 随机涨落</div>
-                <div class="value"><span id="rebirthRandomLevel">0</span></div>
-                <div class="req">价格: 1 转生点</div>
-                <button class="btn-upgrade" id="rebirthRandomBtn" style="border-color:#4a6a9f;">解锁</button>
             </div>
             <div class="upgrade-card" style="border-color: #b8860b;">
                 <div class="label">🔁 全自动 I</div>
@@ -275,49 +257,74 @@
                 <button class="btn-upgrade" id="rebirthAutoBtn" style="border-color:#b8860b;">购买</button>
             </div>
         </div>
-        <div class="upgrade-grid">
+
+        <!-- 自动购买 -->
+        <div class="upgrade-grid" id="cardAutoBuyRow" style="display:none;">
+            <div class="upgrade-card" style="border-color: #00bcd4;">
+                <div class="label">🤖 自动购买升级</div>
+                <div class="value"><span id="rebirthAutoBuyLevel">0</span></div>
+                <div class="req">价格: 2 转生点 · 前置: 随机涨落</div>
+                <button class="btn-upgrade" id="rebirthAutoBuyBtn" style="border-color:#00bcd4;">解锁</button>
+            </div>
+            <div class="upgrade-card" style="border-color: #ff9800;" id="cardAutoRebirth">
+                <div class="label">🌀 自动转生</div>
+                <div class="value"><span id="autoRebirthLevel">0</span></div>
+                <div class="req">价格: 3 转生点 · 前置: 自动购买</div>
+                <button class="btn-upgrade" id="autoRebirthBtn" style="border-color:#ff9800;">解锁</button>
+                <button class="btn-upgrade" id="autoRebirthToggleBtn" style="border-color:#ff9800;margin-top:4px;display:none;">关闭</button>
+            </div>
+        </div>
+
+        <!-- 全自动 II -->
+        <div class="upgrade-grid" id="cardAutoIIRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #d4a017;">
                 <div class="label">🔁🔁 全自动 II</div>
                 <div class="value"><span id="rebirthAutoIILevel">0</span></div>
                 <div class="req">价格: 4 转生点 · 前置: 全自动 I</div>
                 <button class="btn-upgrade" id="rebirthAutoIIBtn" style="border-color:#d4a017;">购买</button>
             </div>
-            <div class="upgrade-card" style="border-color: #ff9800;">
+            <div class="upgrade-card" style="border-color: #ff9800;" id="cardAutoIIIPlaceholder">
                 <div class="label">🔁🔁🔁 全自动 III</div>
                 <div class="value"><span id="rebirthAutoIIILevel">0</span></div>
                 <div class="req">价格: 20 转生点 · 前置: 全自动 II</div>
                 <button class="btn-upgrade" id="rebirthAutoIIIBtn" style="border-color:#ff9800;">购买</button>
             </div>
         </div>
-        <div class="upgrade-grid">
-            <div class="upgrade-card" style="border-color: #ff44aa;">
-                <div class="label">⚡ 经验超频</div>
-                <div class="value"><span id="overclockLevel">0</span></div>
-                <div class="req">价格: 50 转生点 · 12:00冷却 / 45秒×3</div>
-                <button class="btn-upgrade" id="overclockBtn" style="border-color:#ff44aa;">购买</button>
-            </div>
+
+        <!-- 界限突破（解锁后才显示后续 >5 的升级） -->
+        <div class="upgrade-grid" id="cardBreakLimitRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #8fbc8f;">
                 <div class="label">🌌 界限突破</div>
                 <div class="value"><span id="breakLimitLevel">0</span></div>
                 <div class="req">价格: 5 转生点 · 可超过30级</div>
                 <button class="btn-upgrade" id="breakLimitBtn" style="border-color:#8fbc8f;">购买</button>
             </div>
+            <div class="upgrade-card" style="border-color: #ff44aa;" id="cardOverclock">
+                <div class="label">⚡ 经验超频</div>
+                <div class="value"><span id="overclockLevel">0</span></div>
+                <div class="req">价格: 50 转生点 · 12:00冷却 / 45秒×3</div>
+                <button class="btn-upgrade" id="overclockBtn" style="border-color:#ff44aa;">购买</button>
+            </div>
         </div>
-        <div class="upgrade-grid">
+
+        <!-- 免费的等级 -->
+        <div class="upgrade-grid" id="cardFreeLevelRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #00bcd4;">
                 <div class="label">🎁 免费的等级</div>
                 <div class="value"><span id="freeLevelValue">0</span></div>
                 <div class="req">价格: 5 转生点 · 初始15级</div>
                 <button class="btn-upgrade" id="freeLevelBtn" style="border-color:#00bcd4;">购买</button>
             </div>
-            <div class="upgrade-card" style="border-color: #9370db;">
+            <div class="upgrade-card" style="border-color: #9370db;" id="cardMoreLevel">
                 <div class="label">📚 更多的等级 I</div>
                 <div class="value"><span id="moreLevelLevel">0</span></div>
                 <div class="req">价格: 15 转生点 · 保留30级</div>
                 <button class="btn-upgrade" id="moreLevelBtn" style="border-color:#9370db;">购买</button>
             </div>
         </div>
-        <div class="upgrade-grid">
+
+        <!-- 更多的等级 II + 自动的转化 -->
+        <div class="upgrade-grid" id="cardAllLevelRow" style="display:none;">
             <div class="upgrade-card" style="border-color: #9370db;">
                 <div class="label">📚📚 全部的等级</div>
                 <div class="value"><span id="allLevelLevel">0</span></div>
@@ -331,7 +338,9 @@
                 <button class="btn-upgrade" id="autoModeBtn" style="border-color:#ff9800;">解锁</button>
             </div>
         </div>
-        <div class="upgrade-card" style="border-color: #ff9800; margin: 10px 0;">
+
+        <!-- 自动转生设置面板 -->
+        <div class="upgrade-card" id="cardAutoModePanel" style="border-color: #ff9800; margin: 10px 0; display:none;">
             <div class="label">🌀 自动转生设置</div>
             <div style="display: flex; justify-content: center; gap: 6px; margin: 8px 0; flex-wrap: wrap;" id="autoModeRow">
                 <button data-mode="level" class="active" style="background:#2a3455;border:1px solid #b8860b;color:#f5d742;padding:4px 12px;border-radius:20px;font-size:11px;cursor:pointer;">等级</button>
@@ -345,15 +354,14 @@
                 <span id="autoGoalUnit" style="color: #7b88a8; font-size: 12px;">级</span>
             </div>
         </div>
-        <div class="upgrade-grid">
-            <div class="upgrade-card" style="border-color: #ff9800;">
-                <div class="label">🌀 自动转生</div>
-                <div class="value"><span id="autoRebirthLevel">0</span></div>
-                <div class="req">价格: 3 转生点 · 前置: 自动购买</div>
-                <button class="btn-upgrade" id="autoRebirthBtn" style="border-color:#ff9800;">解锁</button>
-                <button class="btn-upgrade" id="autoRebirthToggleBtn" style="border-color:#ff9800;margin-top:4px;display:none;">关闭</button>
-            </div>
+
+        <div class="divider"></div>
+
+        <div class="rebirth-section">
+            <button class="btn-rebirth" id="rebirthBtn2">🌀 转生</button>
         </div>
+
+        <div class="divider"></div>
 
         <div class="ach-section">
             <div class="ach-header">
@@ -415,7 +423,7 @@
             <button class="btn-tool" id="resetBtn">↻ 重置</button>
         </div>
 
-        <div class="footer-note">Alpha 5.7.0 · 经验超频 · 12分钟冷却 / 45秒×3</div>
+        <div class="footer-note">Alpha 5.7.1 · 渐进解锁 · 12分钟冷却 / 45秒×3</div>
     </div>
 
     <script>
@@ -488,12 +496,11 @@
             let multiplierUnlocked = 0;
             let multiplierCount = 0;
 
-            // 经验超频
             let overclockUnlocked = 0;
-            let overclockState = 'cooling'; // 'cooling' 或 'active'
-            let overclockTime = 0;           // 当前状态已过时间（秒）
-            const OC_COOL = 720;             // 12分钟冷却
-            const OC_ACTIVE = 45;            // 45秒超频
+            let overclockState = 'cooling';
+            let overclockTime = 0;
+            const OC_COOL = 720;
+            const OC_ACTIVE = 45;
 
             let achievements = new Array(ACHIEVEMENTS.length).fill(false);
 
@@ -501,79 +508,129 @@
             let lastAutoTick = Date.now();
             const TICK_INTERVAL = 50;
 
-            const levelDisplay = document.getElementById('levelDisplay');
-            const levelLabel = document.getElementById('levelLabel');
-            const expBar = document.getElementById('expBar');
-            const expCurrent = document.getElementById('expCurrent');
-            const expRequired = document.getElementById('expRequired');
-            const totalExpDisplay = document.getElementById('totalExp');
-            const clickCountDisplay = document.getElementById('clickCount');
-            const clickPower = document.getElementById('clickPower');
-            const clickRangeInfo = document.getElementById('clickRangeInfo');
-            const clickBtn = document.getElementById('clickBtn');
-            const manualLevel = document.getElementById('manualLevel');
-            const manualReq = document.getElementById('manualReq');
-            const manualBtn = document.getElementById('manualBtn');
-            const autoLevel = document.getElementById('autoLevel');
-            const autoReq = document.getElementById('autoReq');
-            const autoBtn = document.getElementById('autoBtn');
-            const autoPerSec = document.getElementById('autoPerSec');
-            const multiplierLevel = document.getElementById('multiplierLevel');
-            const multiplierReq = document.getElementById('multiplierReq');
-            const multiplierBtn = document.getElementById('multiplierBtn');
-            const rebirthAutoLevel = document.getElementById('rebirthAutoLevel');
-            const rebirthAutoBtn = document.getElementById('rebirthAutoBtn');
-            const rebirthAutoIILevel = document.getElementById('rebirthAutoIILevel');
-            const rebirthAutoIIBtn = document.getElementById('rebirthAutoIIBtn');
-            const rebirthAutoIIILevel = document.getElementById('rebirthAutoIIILevel');
-            const rebirthAutoIIIBtn = document.getElementById('rebirthAutoIIIBtn');
-            const rebirthRandomLevel = document.getElementById('rebirthRandomLevel');
-            const rebirthRandomBtn = document.getElementById('rebirthRandomBtn');
-            const rebirthCapLevel = document.getElementById('rebirthCapLevel');
-            const rebirthCapReq = document.getElementById('rebirthCapReq');
-            const rebirthCapBtn = document.getElementById('rebirthCapBtn');
-            const rebirthAutoBuyLevel = document.getElementById('rebirthAutoBuyLevel');
-            const rebirthAutoBuyBtn = document.getElementById('rebirthAutoBuyBtn');
-            const autoRebirthLevel = document.getElementById('autoRebirthLevel');
-            const autoRebirthBtn = document.getElementById('autoRebirthBtn');
-            const autoRebirthToggleBtn = document.getElementById('autoRebirthToggleBtn');
-            const rebirthCountDisplay = document.getElementById('rebirthCountDisplay');
-            const rebirthPointsDisplay = document.getElementById('rebirthPointsDisplay');
-            const rebirthBtn = document.getElementById('rebirthBtn');
-            const rebirthBtn2 = document.getElementById('rebirthBtn2');
-            const multiplierDisplay = document.getElementById('multiplierDisplay');
-            const expMultiplierDisplay = document.getElementById('expMultiplierDisplay');
-            const rebirthStatus = document.getElementById('rebirthStatus');
-            const autoBuyStatus = document.getElementById('autoBuyStatus');
-            const autoRebirthStatus = document.getElementById('autoRebirthStatus');
-            const breakLimitLevel = document.getElementById('breakLimitLevel');
-            const breakLimitBtn = document.getElementById('breakLimitBtn');
-            const freeLevelValue = document.getElementById('freeLevelValue');
-            const freeLevelBtn = document.getElementById('freeLevelBtn');
-            const moreLevelLevel = document.getElementById('moreLevelLevel');
-            const moreLevelBtn = document.getElementById('moreLevelBtn');
-            const allLevelLevel = document.getElementById('allLevelLevel');
-            const allLevelBtn = document.getElementById('allLevelBtn');
-            const autoModeLevel = document.getElementById('autoModeLevel');
-            const autoModeBtn = document.getElementById('autoModeBtn');
-            const autoModeRow = document.getElementById('autoModeRow');
-            const autoGoalInput = document.getElementById('autoGoalInput');
-            const autoGoalUnit = document.getElementById('autoGoalUnit');
-            const achList = document.getElementById('achList');
-            const achCount = document.getElementById('achCount');
-            const offlineToast = document.getElementById('offlineToast');
-            const offlineStatus = document.getElementById('offlineStatus');
-            const importArea = document.getElementById('importArea');
-            const importTextarea = document.getElementById('importTextarea');
+            // ---------- DOM 引用（省略重复声明的部分，保持原样） ----------
+            const $ = id => document.getElementById(id);
+            const levelDisplay = $('levelDisplay');
+            const levelLabel = $('levelLabel');
+            const expBar = $('expBar');
+            const expCurrent = $('expCurrent');
+            const expRequired = $('expRequired');
+            const totalExpDisplay = $('totalExp');
+            const clickCountDisplay = $('clickCount');
+            const clickPower = $('clickPower');
+            const clickRangeInfo = $('clickRangeInfo');
+            const clickBtn = $('clickBtn');
+            const manualLevel = $('manualLevel');
+            const manualReq = $('manualReq');
+            const manualBtn = $('manualBtn');
+            const autoLevel = $('autoLevel');
+            const autoReq = $('autoReq');
+            const autoBtn = $('autoBtn');
+            const autoPerSec = $('autoPerSec');
+            const multiplierLevel = $('multiplierLevel');
+            const multiplierReq = $('multiplierReq');
+            const multiplierBtn = $('multiplierBtn');
+            const rebirthAutoLevel = $('rebirthAutoLevel');
+            const rebirthAutoBtn = $('rebirthAutoBtn');
+            const rebirthAutoIILevel = $('rebirthAutoIILevel');
+            const rebirthAutoIIBtn = $('rebirthAutoIIBtn');
+            const rebirthAutoIIILevel = $('rebirthAutoIIILevel');
+            const rebirthAutoIIIBtn = $('rebirthAutoIIIBtn');
+            const rebirthRandomLevel = $('rebirthRandomLevel');
+            const rebirthRandomBtn = $('rebirthRandomBtn');
+            const rebirthCapLevel = $('rebirthCapLevel');
+            const rebirthCapReq = $('rebirthCapReq');
+            const rebirthCapBtn = $('rebirthCapBtn');
+            const rebirthAutoBuyLevel = $('rebirthAutoBuyLevel');
+            const rebirthAutoBuyBtn = $('rebirthAutoBuyBtn');
+            const autoRebirthLevel = $('autoRebirthLevel');
+            const autoRebirthBtn = $('autoRebirthBtn');
+            const autoRebirthToggleBtn = $('autoRebirthToggleBtn');
+            const rebirthCountDisplay = $('rebirthCountDisplay');
+            const rebirthPointsDisplay = $('rebirthPointsDisplay');
+            const rebirthBtn = $('rebirthBtn');
+            const rebirthBtn2 = $('rebirthBtn2');
+            const multiplierDisplay = $('multiplierDisplay');
+            const expMultiplierDisplay = $('expMultiplierDisplay');
+            const rebirthStatus = $('rebirthStatus');
+            const autoBuyStatus = $('autoBuyStatus');
+            const autoRebirthStatus = $('autoRebirthStatus');
+            const breakLimitLevel = $('breakLimitLevel');
+            const breakLimitBtn = $('breakLimitBtn');
+            const freeLevelValue = $('freeLevelValue');
+            const freeLevelBtn = $('freeLevelBtn');
+            const moreLevelLevel = $('moreLevelLevel');
+            const moreLevelBtn = $('moreLevelBtn');
+            const allLevelLevel = $('allLevelLevel');
+            const allLevelBtn = $('allLevelBtn');
+            const autoModeLevel = $('autoModeLevel');
+            const autoModeBtn = $('autoModeBtn');
+            const autoModeRow = $('autoModeRow');
+            const autoGoalInput = $('autoGoalInput');
+            const autoGoalUnit = $('autoGoalUnit');
+            const achList = $('achList');
+            const achCount = $('achCount');
+            const offlineToast = $('offlineToast');
+            const offlineStatus = $('offlineStatus');
+            const importArea = $('importArea');
+            const importTextarea = $('importTextarea');
+            const overclockArea = $('overclockArea');
+            const ocBar = $('ocBar');
+            const ocText = $('ocText');
+            const overclockLevel = $('overclockLevel');
+            const overclockBtn = $('overclockBtn');
+            const overclockStatus = $('overclockStatus');
 
-            // 超频 DOM
-            const overclockArea = document.getElementById('overclockArea');
-            const ocBar = document.getElementById('ocBar');
-            const ocText = document.getElementById('ocText');
-            const overclockLevel = document.getElementById('overclockLevel');
-            const overclockBtn = document.getElementById('overclockBtn');
-            const overclockStatus = document.getElementById('overclockStatus');
+            // ---------- 渐进解锁：控制卡片显隐 ----------
+            function updateVisibility() {
+                const show = (id, cond) => {
+                    const el = $(id);
+                    if (el) el.style.display = cond ? '' : 'none';
+                };
 
+                // 随机涨落行：买了随机涨落前，整行只显示“随机涨落”卡（上限提高卡隐藏）
+                // 规则：没有购买随机涨落时，看不到上限提高
+                show('cardRandomRow', rebirthRandom === 1 || rebirthPoints >= 1 || rebirthCount >= 1);
+
+                // 上限提高卡：随机涨落未解锁时隐藏
+                show('rebirthCapBtn', true); // 按钮显隐由 disabled 控制，这里保持
+                const capCard = rebirthCapBtn.closest('.upgrade-card');
+                if (capCard) capCard.style.display = (rebirthRandom === 1) ? '' : 'none';
+
+                // 倍率行：购买随机涨落后可见（含倍率增加 + 全自动 I）
+                show('cardMultiplierRow', rebirthRandom === 1);
+
+                // 自动购买行：购买随机涨落后可见（含自动购买 + 自动转生）
+                show('cardAutoBuyRow', rebirthRandom === 1);
+
+                // 自动转生卡：购买自动购买后才可见
+                show('cardAutoRebirth', rebirthAutoBuy === 1);
+
+                // 全自动 II 行：购买全自动 I 后才可见
+                show('cardAutoIIRow', rebirthAuto === 1);
+
+                // 全自动 III 卡：购买全自动 II 后才可见
+                show('cardAutoIIIPlaceholder', rebirthAutoII === 1);
+
+                // 界限突破行：购买随机涨落后可见；界限突破购买后，显示后续 >5 的升级（经验超频）
+                show('cardBreakLimitRow', rebirthRandom === 1);
+                // 经验超频卡：购买界限突破后才可见
+                show('cardOverclock', breakLimit === 1);
+
+                // 免费的等级行：购买界限突破后才可见（价格 >5 的后续）
+                show('cardFreeLevelRow', breakLimit === 1);
+
+                // 更多的等级卡：购买免费的等级后才可见
+                show('cardMoreLevel', freeLevel === 1);
+
+                // 全部的等级行：购买更多的等级后才可见
+                show('cardAllLevelRow', moreLevel === 1);
+
+                // 自动转生设置面板：解锁自动的转化后才可见
+                show('cardAutoModePanel', autoModeUnlocked === 1);
+            }
+
+            // 其余逻辑保持 Alpha 5.7.0 原样
             function getManualReq() { return 2 + manualCount * 2; }
             function getAutoReq() {
                 if (autoCount === 0) return 3;
@@ -592,7 +649,6 @@
                 if (multiplierUnlocked === 0) return 1;
                 return 1 + multiplierCount;
             }
-            // 超频倍率
             function getOverclockMultiplier() {
                 if (overclockUnlocked === 1 && overclockState === 'active') return 3;
                 return 1;
@@ -634,12 +690,10 @@
                 if (rebirthPoints <= 20) return 30;
                 return Math.floor(30 * (1 + Math.log10(rebirthPoints - 20)));
             }
-
             function getRebirthMultiplierGain() {
                 if (level < 30) return 0;
                 return Math.pow(level - 29, 2);
             }
-
             function getStartLevel() {
                 if (allLevel === 1) return 45;
                 if (moreLevel === 1) return 30;
@@ -688,14 +742,11 @@
                 }
                 if (changed) renderAchievements();
             }
-
             function showAchNotification(name) {
-                const toast = document.getElementById('offlineToast');
-                toast.style.display = 'block';
-                toast.innerHTML = `🏆 成就解锁：<span class="big">${name}</span>`;
-                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+                offlineToast.style.display = 'block';
+                offlineToast.innerHTML = `🏆 成就解锁：<span class="big">${name}</span>`;
+                setTimeout(() => { offlineToast.style.display = 'none'; }, 3000);
             }
-
             function renderAchievements() {
                 let html = '';
                 let count = 0;
@@ -728,6 +779,9 @@
             }
 
             function render() {
+                // ★ 每次渲染前先更新显隐
+                updateVisibility();
+
                 const required = getRequiredExp(level);
                 const cap = getLevelCap();
                 const isCapped = (level >= cap);
@@ -777,13 +831,11 @@
                     multiplierBtn.textContent = (level >= multReq) ? '购买' : '🔒 等级不足';
                 }
 
-                // 经验超频
                 overclockLevel.textContent = overclockUnlocked;
                 const canBuyOverclock = (rebirthPoints >= 50 && overclockUnlocked === 0);
                 overclockBtn.disabled = !canBuyOverclock;
                 overclockBtn.textContent = (overclockUnlocked === 1) ? '✅ 已购买' : (rebirthPoints < 50 ? '🔒 转生点不足' : '购买 (50点)');
 
-                // 超频状态条
                 if (overclockUnlocked === 1) {
                     overclockArea.style.display = 'block';
                     if (overclockState === 'active') {
@@ -929,9 +981,7 @@
                         exp -= required;
                         level += 1;
                     } else {
-                        if (level >= cap) {
-                            exp = 0;
-                        }
+                        if (level >= cap) { exp = 0; }
                         break;
                     }
                 }
@@ -939,10 +989,7 @@
 
             function addExp(amount, isManual = true) {
                 const cap = getLevelCap();
-                if (level >= cap) {
-                    if (isManual) clicks += 1;
-                    return;
-                }
+                if (level >= cap) { if (isManual) clicks += 1; return; }
                 exp += amount;
                 totalExp += amount;
                 if (isManual) clicks += 1;
@@ -1018,10 +1065,8 @@
                     const multiplierGain = getRebirthMultiplierGain();
                     if (!confirm(`确定转生吗？\n当前等级: ${level}\n放大倍率增加: +${multiplierGain}\n转生点门槛: ${threshold}级\n当前转生点: ${rebirthPoints}\n\n转生升级将永久保留！`)) return;
                 }
-
                 const multiplierGain = getRebirthMultiplierGain();
                 rebirthCount += multiplierGain;
-
                 let pointsGained = 0;
                 const threshold = getRebirthPointThreshold();
                 if (rebirthCount >= 20 && breakLimit === 0) {
@@ -1030,24 +1075,19 @@
                     pointsGained = 1;
                 }
                 rebirthPoints += pointsGained;
-
                 level = getStartLevel();
                 exp = 0;
                 totalExp = 0;
                 clicks = 0;
                 manualCount = 0;
                 autoCount = 0;
-
                 multiplierCount = 0;
                 rebirthCap = 0;
-
                 autoTimeStart = Date.now();
                 autoAmpStart = getMultiplier();
                 autoPPStart = rebirthPoints;
-
                 render();
                 saveGame();
-
                 if (!silent) {
                     alert(`✅ 转生成功！\n放大倍率增加: +${multiplierGain}\n当前放大倍率: ${getMultiplier().toFixed(1)}x\n获得转生点: ${pointsGained}\n当前转生点: ${rebirthPoints}\n初始等级: ${level}级`);
                 }
@@ -1209,8 +1249,8 @@
             autoRebirthToggleBtn.addEventListener('click', toggleAutoRebirth);
             rebirthBtn.addEventListener('click', function() { performRebirth(false); });
             rebirthBtn2.addEventListener('click', function() { performRebirth(false); });
-            document.getElementById('resetBtn').addEventListener('click', resetGame);
-            document.getElementById('exportBtn').addEventListener('click', exportSave);
+            $('resetBtn').addEventListener('click', resetGame);
+            $('exportBtn').addEventListener('click', exportSave);
 
             autoModeRow.addEventListener('click', function(e) {
                 const btn = e.target.closest('button');
@@ -1226,15 +1266,15 @@
                 if (!isNaN(val) && val > 0) { autoGoal = val; }
             });
 
-            document.getElementById('importBtn').addEventListener('click', function() {
+            $('importBtn').addEventListener('click', function() {
                 importArea.classList.toggle('active');
                 if (importArea.classList.contains('active')) { importTextarea.focus(); }
             });
-            document.getElementById('importCancelBtn').addEventListener('click', function() {
+            $('importCancelBtn').addEventListener('click', function() {
                 importArea.classList.remove('active');
                 importTextarea.value = '';
             });
-            document.getElementById('importConfirmBtn').addEventListener('click', function() {
+            $('importConfirmBtn').addEventListener('click', function() {
                 const text = importTextarea.value.trim();
                 if (!text) { alert('请粘贴存档文本！'); return; }
                 if (importFromText(text)) {
@@ -1249,67 +1289,49 @@
 
             window.addEventListener('beforeunload', saveGame);
 
-            // ★ 超频计时（每秒）
             let lastOcTick = Date.now();
             function overclockTick() {
                 if (overclockUnlocked !== 1) return;
                 const now = Date.now();
                 const delta = (now - lastOcTick) / 1000;
                 lastOcTick = now;
-
                 overclockTime += delta;
-
                 if (overclockState === 'cooling') {
-                    if (overclockTime >= OC_COOL) {
-                        overclockTime = 0;
-                        overclockState = 'active';
-                    }
+                    if (overclockTime >= OC_COOL) { overclockTime = 0; overclockState = 'active'; }
                 } else {
-                    if (overclockTime >= OC_ACTIVE) {
-                        overclockTime = 0;
-                        overclockState = 'cooling';
-                    }
+                    if (overclockTime >= OC_ACTIVE) { overclockTime = 0; overclockState = 'cooling'; }
                 }
             }
 
             function frameLoop() {
                 const now = Date.now();
                 const elapsed = now - lastAutoTick;
-
                 if (elapsed >= TICK_INTERVAL) {
                     const ticks = Math.floor(elapsed / TICK_INTERVAL);
                     const autoPower = getAutoPower();
                     const cap = getLevelCap();
-
                     if (autoPower > 0 && level < cap) {
                         const gain = (autoPower / 20) * ticks;
                         exp += gain;
                         totalExp += gain;
                         checkLevelUp();
                     }
-
                     lastAutoTick += ticks * TICK_INTERVAL;
-
                     autoBuyUpgrades();
                     checkAutoRebirth();
                     overclockTick();
                     render();
                 }
-
                 requestAnimationFrame(frameLoop);
             }
 
             const loaded = loadGame();
-            if (!loaded) {
-                render();
-                renderAchievements();
-            }
+            if (!loaded) { render(); renderAchievements(); }
             requestAnimationFrame(frameLoop);
             setInterval(saveGame, 5000);
 
-            console.log('✅ 等级模拟器 · Alpha 5.7.0');
-            console.log('⚡ 经验超频：12分钟冷却 / 45秒×3');
-            console.log('📐 1.25次幂 · 30级上限 · 30级转生');
+            console.log('✅ 等级模拟器 · Alpha 5.7.1');
+            console.log('⚡ 渐进解锁：按依赖关系显示升级卡片');
         })();
     </script>
 </body>
